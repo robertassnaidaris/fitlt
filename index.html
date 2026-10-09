@@ -1483,9 +1483,9 @@ const FOODS = [
 // m = MET koeficientas; kcal = MET × 3,5 × svoris(kg) / 200 × minutės
 // d = numatytoji trukmė minutėmis
 const METS = [
-  {n:"Ėjimas lėtai (4 km/h)",e:"Walking, slow",m:3.0,g:"Kardio",d:30},
-  {n:"Ėjimas spraičiai (5,5 km/h)",e:"Walking, brisk",m:4.3,g:"Kardio",d:30},
-  {n:"Ėjimas į kalną",e:"Walking uphill",m:6.0,g:"Kardio",d:30},
+  {n:"Vaikščiojimas lėtai (4 km/h)",e:"Walking, slow",m:3.0,g:"Kardio",d:30},
+  {n:"Vaikščiojimas sparčiai (5,5 km/h)",e:"Walking, brisk",m:4.3,g:"Kardio",d:30},
+  {n:"Vaikščiojimas į kalną",e:"Walking uphill",m:6.0,g:"Kardio",d:30},
   {n:"Šiaurietiškas ėjimas",e:"Nordic walking",m:4.8,g:"Kardio",d:45},
   {n:"Bėgimas lėtas (8 km/h)",e:"Running, 8 km/h",m:8.3,g:"Kardio",d:30},
   {n:"Bėgimas vidutinis (10 km/h)",e:"Running, 10 km/h",m:9.8,g:"Kardio",d:30},
@@ -2033,6 +2033,41 @@ function metKcal(met, min) { return Math.round(met * 3.5 * bodyWeight() / 200 * 
 
 function fname(o) { return (LANG === 'en' && o.e) ? o.e : o.n; }
 
+// Paieškai nuimame lietuviškas raides — telefone dauguma rašo be jų,
+// tad „vistiena" turi rasti „Vištienos krūtinėlę".
+const LT_MAP = { 'ą':'a','č':'c','ę':'e','ė':'e','į':'i','š':'s','ų':'u','ū':'u','ž':'z' };
+function norm(str) {
+  return String(str).toLowerCase().replace(/[ąčęėįšųūž]/g, c => LT_MAP[c]);
+}
+
+// Lietuviški linksniai: bazėje „Vištienos krūtinėlė", o žmogus rašo „vistiena".
+// Todėl be paprasto sutapimo tikrinam ir žodžio šaknį (nukandam galūnę).
+// Grąžina atitikimo tikslumą: 0 = geriausias, 99 = netinka.
+// Taip „alus" pirmiausia rodo alų, o ne „jogurtą (natūralus)".
+function score(obj, q) {
+  if (!q) return 0;
+  const name = norm(obj.n), en = obj.e ? norm(obj.e) : '', cat = norm(obj.g || '');
+  const words = (name + ' ' + en).split(/[^a-z0-9]+/).filter(Boolean);
+  if (name.startsWith(q) || en.startsWith(q)) return 0;
+  if (words.some(w => w.startsWith(q))) return 1;
+  if (name.includes(q) || en.includes(q)) return 2;
+  if (q.length >= 4) {
+    const stem = q.slice(0, Math.max(4, q.length - 2));
+    if (words.some(w => w.startsWith(stem))) return 3;
+  }
+  if (cat.includes(q)) return 4;
+  if (q.length >= 4) {
+    const stem = q.slice(0, Math.max(4, q.length - 2));
+    if (cat.split(/[^a-z0-9]+/).some(w => w.startsWith(stem))) return 5;
+  }
+  return 99;
+}
+
+function rank(arr, q) {
+  return arr.map(o => [score(o, q), o]).filter(x => x[0] < 99)
+            .sort((a, b) => a[0] - b[0]).map(x => x[1]);
+}
+
 // ── Pagrindinis dienyno atvaizdavimas ──
 function renderDashboard() {
   const tf = ST.foods.filter(f => f.date === today);
@@ -2170,10 +2205,10 @@ function renderFoodChips() {
 function setFoodFilter(c) { foodFilter = c; renderFoodChips(); renderFoodResults(); }
 
 function renderFoodResults() {
-  const q = document.getElementById('foodSrch').value.trim().toLowerCase();
+  const q = norm(document.getElementById('foodSrch').value.trim());
   let list;
   if (q) {
-    list = FOODS.filter(f => f.n.toLowerCase().includes(q) || (f.e && f.e.toLowerCase().includes(q)));
+    list = rank(FOODS, q);
   } else if (foodFilter === 'Dažniausi') {
     const rec = ST.recent || [];
     list = rec.map(n => FOODS.find(f => f.n === n)).filter(Boolean);
@@ -2283,9 +2318,9 @@ function renderExerChips() {
 function setExerFilter(c) { exerFilter = c; renderExerChips(); renderExerResults(); }
 
 function renderExerResults() {
-  const q = document.getElementById('exerSrch').value.trim().toLowerCase();
+  const q = norm(document.getElementById('exerSrch').value.trim());
   let list = METS;
-  if (q) list = METS.filter(e => e.n.toLowerCase().includes(q) || (e.e && e.e.toLowerCase().includes(q)));
+  if (q) list = rank(METS, q);
   else if (exerFilter !== 'Visi') list = METS.filter(e => e.g === exerFilter);
   const box = document.getElementById('exerResults');
   if (!list.length) {
