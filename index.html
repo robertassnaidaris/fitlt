@@ -2530,6 +2530,8 @@ if('serviceWorker' in navigator) {
 }
 
 async function askNotifications() {
+  // iOS Safari neįdiegtoje programėlėje Notification neegzistuoja
+  if(typeof Notification === 'undefined') return;
   if(Notification.permission === 'default') {
     const perm = await Notification.requestPermission();
     if(perm === 'granted') {
@@ -2542,6 +2544,7 @@ async function askNotifications() {
 }
 
 function scheduleReminders() {
+  if(typeof Notification === 'undefined') return;
   // Local reminder via setTimeout (works without push server)
   const now = new Date();
   const reminder = new Date();
