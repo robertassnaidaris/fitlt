@@ -17,12 +17,38 @@ Nuoroda vieša — gali laisvai dalintis su kuo nori, nereikia jokių prisijungi
 
 | | fitlt.eu | ši versija |
 |---|---|---|
+| Valdymas | 8 skirtukai viršuje | **apatinė juosta + „+" mygtukas** |
+| Maisto suvedimas | ranka rašyti kcal, B/AV/R | **paieška 207 produktų bazėje** |
+| Treniruotės | ranka rašyti sudegintas kcal | **58 veiklos, skaičiuoja pagal svorį (MET)** |
+| Pagrindinis ekranas | suvestinė su žiedu | **dienynas: Tikslas − Maistas + Mankšta = Liko** |
 | Pratimai su vaizdo paieška | 5 nemokami, 12 už užrakto | **visi 17** |
 | Stripe mokėjimai, premium kodai | yra | išimta |
-| Kainų langas, „⭐ Premium" ženklelis | yra | išimta |
 | Duomenų kopija (eksportas/importas) | nebuvo | **yra** |
 
 Mokamoji versija (aplankas `../fitlt/`, fitlt.eu) lieka nepaliesta.
+
+## Valdymas
+
+Perdaryta pagal klasikinį MyFitnessPal dienyną — tą patį išdėstymą, kurį
+naudotojai gynė, kai 2026 m. balandį gamintojas jį pakeitė ir reitingas krito.
+
+**Apatinė juosta:** Dienynas · Planas · **➕** · Pažanga · Daugiau
+
+- **Dienynas** — pagrindinis ekranas. Viršuje `Tikslas − Maistas + Mankšta = Liko`,
+  žemiau keturios valgymų kortelės (pusryčiai, pietūs, vakarienė, užkandis),
+  treniruotės, vanduo ir svoris. Prie kiekvieno — „+ Pridėti".
+- **➕** — greitas pridėjimas iš bet kur: maistas, treniruotė, stiklinė vandens, svoris.
+- **Daugiau** — pratimų biblioteka, receptai, profilis, kalba, duomenų kopija.
+
+## Duomenų bazės
+
+- `FOODS` — 207 produktai, reikšmės 100 g; kiekvienam 2–3 porcijų variantai
+  („1 vnt (120 g)", „Porcija (150 g)"). Įtraukti lietuviški patiekalai:
+  cepelinai, šaltibarščiai, kugelis, balandėliai, kibinai, šakotis, vėdarai.
+  Visos reikšmės patikrintos pagal Atwater formulę (kcal ≈ 4B + 4AV + 9R).
+- `METS` — 58 veiklos su MET koeficientais (Compendium of Physical Activities).
+  Kalorijos: `MET × 3,5 × svoris(kg) / 200 × minutės` — naudotojui nieko
+  skaičiuoti nereikia, svoris imamas iš paskutinio įrašo arba profilio.
 
 ## Duomenys
 
