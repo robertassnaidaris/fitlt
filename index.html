@@ -1,0 +1,3075 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#08080F">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FitLT">
+<link rel="manifest" href="manifest.json">
+<title>FitLT — Jūsų asmeninis treneris</title>
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg:#08080F;
+  --bg2:#0D0D1A;
+  --card:rgba(255,255,255,0.04);
+  --card-b:rgba(255,255,255,0.08);
+  --card-h:rgba(255,255,255,0.07);
+  --p1:#8B5CF6; --p2:#D946EF;
+  --a1:#F43F5E; --a2:#FB923C;
+  --g1:#10B981; --g2:#34D399;
+  --y1:#F59E0B;
+  --text:#F1F0FF;
+  --text2:#94A3B8;
+  --text3:#64748B;
+  --blur:blur(24px);
+  --r:20px;
+  --shadow:0 8px 32px rgba(0,0,0,0.4);
+}
+html { scroll-behavior:smooth; }
+body {
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif;
+  min-height:100vh;
+  display:flex; flex-direction:column;
+  -webkit-font-smoothing:antialiased;
+}
+/* scrollbars */
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:rgba(139,92,246,0.4); border-radius:99px; }
+
+/* ── NAV ─────────────────────────────────────────── */
+.nav {
+  position:sticky; top:0; z-index:200;
+  background:rgba(8,8,15,0.8);
+  backdrop-filter:var(--blur);
+  -webkit-backdrop-filter:var(--blur);
+  border-bottom:1px solid var(--card-b);
+  padding:0 20px;
+  height:64px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.logo {
+  font-size:22px; font-weight:900;
+  background:linear-gradient(135deg,var(--p1),var(--p2));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  letter-spacing:-1px;
+}
+.logo sub { font-size:10px; font-weight:500; color:var(--text2); -webkit-text-fill-color:var(--text2); letter-spacing:0; vertical-align:bottom; margin-left:2px; }
+.nav-right { display:flex; align-items:center; gap:10px; }
+.premium-badge {
+  background:linear-gradient(135deg,var(--y1),#F97316);
+  color:white; font-size:10px; font-weight:800;
+  padding:4px 10px; border-radius:99px;
+  letter-spacing:0.5px; cursor:pointer;
+  text-transform:uppercase;
+  box-shadow:0 0 16px rgba(245,158,11,0.4);
+  transition:transform 0.2s;
+}
+.premium-badge:hover { transform:scale(1.05); }
+.premium-badge.active { background:linear-gradient(135deg,var(--g1),var(--g2)); box-shadow:0 0 16px rgba(16,185,129,0.4); cursor:default; }
+.nav-date { color:var(--text2); font-size:12px; }
+
+/* ── TABS ─────────────────────────────────────────── */
+.tabs {
+  display:flex;
+  background:rgba(8,8,15,0.6);
+  backdrop-filter:var(--blur);
+  border-bottom:1px solid var(--card-b);
+  padding:0 12px;
+  overflow-x:auto;
+  scrollbar-width:none;
+  gap:2px;
+}
+.tabs::-webkit-scrollbar { display:none; }
+.tab {
+  flex-shrink:0;
+  padding:12px 16px;
+  border:none; background:none;
+  color:var(--text3);
+  font-size:13px; font-weight:600;
+  cursor:pointer;
+  border-bottom:2px solid transparent;
+  transition:all 0.25s;
+  white-space:nowrap;
+}
+.tab.active { color:#fff; border-bottom-color:var(--p1); }
+.tab:hover:not(.active) { color:var(--text2); }
+
+/* ── MAIN ─────────────────────────────────────────── */
+.main { flex:1; padding:20px; max-width:900px; width:100%; margin:0 auto; }
+.section { display:none; animation:fadeIn 0.3s ease; }
+.section.active { display:block; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── CARDS ─────────────────────────────────────────── */
+.card {
+  background:var(--card);
+  border:1px solid var(--card-b);
+  border-radius:var(--r);
+  padding:20px;
+  backdrop-filter:var(--blur);
+  margin-bottom:16px;
+  transition:border-color 0.2s;
+}
+.card:hover { border-color:rgba(139,92,246,0.2); }
+.card-title {
+  font-size:11px; font-weight:700; color:var(--text2);
+  text-transform:uppercase; letter-spacing:1.5px; margin-bottom:16px;
+}
+.section-title { font-size:20px; font-weight:800; margin-bottom:4px; }
+.section-sub { font-size:13px; color:var(--text2); margin-bottom:20px; }
+
+/* ── GRID ─────────────────────────────────────────── */
+.g2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+.g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:16px; }
+
+/* ── STAT CHIP ─────────────────────────────────────── */
+.chip {
+  background:var(--card);
+  border:1px solid var(--card-b);
+  border-radius:16px;
+  padding:16px 12px;
+  text-align:center;
+  backdrop-filter:var(--blur);
+  transition:transform 0.2s, border-color 0.2s;
+  cursor:default;
+}
+.chip:hover { transform:translateY(-2px); border-color:rgba(139,92,246,0.3); }
+.chip-ico { font-size:24px; margin-bottom:8px; }
+.chip-val { font-size:24px; font-weight:800; }
+.chip-lbl { font-size:11px; color:var(--text2); margin-top:4px; }
+
+/* ── RING ─────────────────────────────────────────── */
+.ring-wrap { display:flex; align-items:center; gap:28px; }
+.ring-info h2 { font-size:40px; font-weight:900; line-height:1; }
+.ring-info p { color:var(--text2); font-size:13px; margin-top:6px; }
+.ring-info .left { font-size:15px; font-weight:700; margin-top:10px; }
+.ring-meta { display:flex; gap:24px; margin-top:16px; }
+.ring-meta-item { }
+.ring-meta-item .r-lbl { font-size:11px; color:var(--text2); }
+.ring-meta-item .r-val { font-size:16px; font-weight:700; margin-top:2px; }
+
+/* ── MACRO BARS ─────────────────────────────────────── */
+.macro { margin-bottom:10px; }
+.macro-top { display:flex; justify-content:space-between; font-size:12px; margin-bottom:5px; }
+.macro-top span:first-child { font-weight:600; }
+.macro-track { height:6px; background:rgba(255,255,255,0.06); border-radius:99px; overflow:hidden; }
+.macro-fill { height:100%; border-radius:99px; transition:width 0.6s cubic-bezier(.4,0,.2,1); }
+
+/* ── WATER ─────────────────────────────────────────── */
+.water-grid { display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
+.w-dot {
+  width:40px; height:40px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px; cursor:pointer;
+  background:rgba(255,255,255,0.04);
+  border:1.5px solid rgba(255,255,255,0.08);
+  transition:all 0.2s; user-select:none;
+}
+.w-dot.on { background:rgba(139,92,246,0.2); border-color:var(--p1); transform:scale(1.1); }
+
+/* ── BUTTONS ─────────────────────────────────────────── */
+.btn {
+  background:linear-gradient(135deg,var(--p1),var(--p2));
+  border:none; border-radius:12px;
+  padding:11px 20px; color:#fff;
+  font-size:13px; font-weight:700;
+  cursor:pointer;
+  transition:all 0.2s;
+  box-shadow:0 4px 16px rgba(139,92,246,0.3);
+  white-space:nowrap;
+}
+.btn:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(139,92,246,0.4); }
+.btn:active { transform:translateY(0); }
+.btn-sm { padding:7px 14px; font-size:12px; border-radius:9px; }
+.btn-ghost {
+  background:var(--card); border:1px solid var(--card-b);
+  border-radius:12px; padding:11px 20px;
+  color:var(--text2); font-size:13px; font-weight:600;
+  cursor:pointer; transition:all 0.2s; white-space:nowrap;
+}
+.btn-ghost:hover { background:var(--card-h); color:var(--text); }
+.btn-danger { background:linear-gradient(135deg,var(--a1),#be123c); box-shadow:0 4px 16px rgba(244,63,94,0.2); }
+.btn-green { background:linear-gradient(135deg,var(--g1),var(--g2)); box-shadow:0 4px 16px rgba(16,185,129,0.3); }
+.btn-gold { background:linear-gradient(135deg,var(--y1),#F97316); box-shadow:0 4px 16px rgba(245,158,11,0.3); }
+
+/* ── INPUTS ─────────────────────────────────────────── */
+.form-row { display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap; }
+.inp {
+  flex:1; min-width:130px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:12px;
+  padding:11px 14px;
+  color:var(--text);
+  font-size:13px;
+  outline:none;
+  transition:border-color 0.2s, background 0.2s;
+}
+.inp:focus { border-color:var(--p1); background:rgba(139,92,246,0.06); }
+.inp::placeholder { color:var(--text3); }
+select.inp option { background:#1A1A2E; }
+
+/* ── LIST ITEMS ─────────────────────────────────────── */
+.li {
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--card-b);
+  border-radius:14px;
+  padding:13px 16px;
+  margin-bottom:8px;
+  display:flex; align-items:center; justify-content:space-between;
+  animation:slideUp 0.25s ease;
+  transition:background 0.2s;
+}
+.li:hover { background:rgba(255,255,255,0.05); }
+@keyframes slideUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+.li-l { flex:1; }
+.li-title { font-size:14px; font-weight:600; }
+.li-sub { font-size:12px; color:var(--text2); margin-top:3px; }
+
+/* ── BADGES ─────────────────────────────────────────── */
+.badge {
+  display:inline-block;
+  font-size:10px; font-weight:700; letter-spacing:0.3px;
+  padding:3px 9px; border-radius:99px; margin-right:6px;
+}
+.b-p { background:rgba(139,92,246,0.15); color:#A78BFA; }
+.b-r { background:rgba(244,63,94,0.15); color:#FB7185; }
+.b-g { background:rgba(16,185,129,0.15); color:#34D399; }
+.b-y { background:rgba(245,158,11,0.15); color:#FCD34D; }
+.b-b { background:rgba(59,130,246,0.15); color:#93C5FD; }
+
+/* ── EXERCISE CARDS ─────────────────────────────────── */
+.ex-filters { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+.ex-filter {
+  padding:7px 16px; border-radius:99px;
+  border:1px solid var(--card-b);
+  background:var(--card);
+  color:var(--text2); font-size:12px; font-weight:600;
+  cursor:pointer; transition:all 0.2s;
+}
+.ex-filter.active { background:rgba(139,92,246,0.2); border-color:var(--p1); color:#A78BFA; }
+
+.ex-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:14px; }
+.ex-card {
+  background:var(--card);
+  border:1px solid var(--card-b);
+  border-radius:18px;
+  overflow:hidden;
+  cursor:pointer;
+  transition:all 0.25s;
+  position:relative;
+}
+.ex-card:hover { transform:translateY(-4px); border-color:rgba(139,92,246,0.4); box-shadow:0 12px 40px rgba(139,92,246,0.15); }
+.ex-card-thumb {
+  height:130px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:56px;
+  position:relative;
+}
+.ex-card-body { padding:14px; }
+.ex-card-name { font-size:15px; font-weight:700; margin-bottom:4px; }
+.ex-card-sub { font-size:12px; color:var(--text2); }
+.ex-card-meta { display:flex; align-items:center; justify-content:space-between; margin-top:10px; }
+.stars { color:var(--y1); font-size:12px; }
+/* ── EXERCISE MODAL ─────────────────────────────────── */
+.modal-bg {
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.8);
+  backdrop-filter:blur(8px);
+  z-index:500;
+  display:flex; align-items:flex-end;
+  animation:modalBgIn 0.25s ease;
+}
+@keyframes modalBgIn { from{opacity:0} to{opacity:1} }
+.modal {
+  background:#0F0F1C;
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:24px 24px 0 0;
+  width:100%; max-width:600px;
+  margin:0 auto;
+  max-height:90vh;
+  overflow-y:auto;
+  padding:28px 24px 40px;
+  animation:modalIn 0.35s cubic-bezier(.34,1.56,.64,1);
+}
+.modal-center { border-radius:24px; margin:auto; }
+@keyframes modalIn { from{transform:translateY(100%)} to{transform:translateY(0)} }
+.modal-handle {
+  width:40px; height:4px; background:rgba(255,255,255,0.15);
+  border-radius:99px; margin:0 auto 20px;
+}
+.modal-close {
+  float:right;
+  background:rgba(255,255,255,0.08); border:none;
+  width:32px; height:32px; border-radius:50%;
+  color:var(--text2); font-size:16px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:background 0.2s;
+}
+.modal-close:hover { background:rgba(255,255,255,0.15); }
+.ex-modal-hero {
+  height:100px; font-size:60px;
+  display:flex; align-items:center; justify-content:center;
+  border-radius:16px; margin-bottom:20px;
+}
+.muscles-wrap { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px; }
+.step-list { counter-reset:steps; }
+.step-item {
+  display:flex; gap:12px; align-items:flex-start;
+  padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.05);
+  counter-increment:steps;
+}
+.step-item:last-child { border-bottom:none; }
+.step-num {
+  width:26px; height:26px; border-radius:50%;
+  background:linear-gradient(135deg,var(--p1),var(--p2));
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:800; flex-shrink:0;
+}
+.step-txt { font-size:13px; line-height:1.5; padding-top:4px; }
+.tip-list { list-style:none; }
+.tip-item {
+  padding:8px 0; font-size:13px; color:var(--text2);
+  border-bottom:1px solid rgba(255,255,255,0.04);
+  padding-left:20px; position:relative;
+}
+.tip-item::before { content:'✓'; position:absolute; left:0; color:var(--g1); font-weight:700; }
+.mistake-item::before { content:'✗'; color:var(--a1); }
+
+/* ── MEAL SECTION ─────────────────────────────────── */
+.meal-hdr { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--card-b); margin-bottom:10px; }
+.meal-name { font-weight:700; font-size:14px; }
+.meal-cal { font-size:13px; color:var(--text2); }
+
+/* ── CHART ─────────────────────────────────────────── */
+.chart-wrap { margin-top:8px; }
+canvas { display:block; width:100% !important; }
+
+/* ── WEIGHT ─────────────────────────────────────────── */
+.wt-entry { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.04); font-size:13px; }
+.wt-entry:last-child { border-bottom:none; }
+
+/* ── EMPTY ─────────────────────────────────────────── */
+.empty { text-align:center; padding:36px 20px; color:var(--text2); }
+.empty-ico { font-size:44px; margin-bottom:12px; }
+.empty p { font-size:13px; line-height:1.6; }
+
+/* ── QUICK CHIPS ─────────────────────────────────────── */
+.quick-wrap { display:flex; gap:8px; flex-wrap:wrap; }
+.q-btn {
+  background:rgba(255,255,255,0.05);
+  border:1px solid var(--card-b);
+  border-radius:99px;
+  padding:7px 14px;
+  color:var(--text2); font-size:12px; font-weight:600;
+  cursor:pointer; transition:all 0.2s;
+}
+.q-btn:hover { background:rgba(139,92,246,0.15); border-color:var(--p1); color:#A78BFA; }
+
+/* ── TOAST ─────────────────────────────────────────── */
+.toast {
+  position:fixed; bottom:28px; left:50%; transform:translateX(-50%);
+  background:rgba(15,15,28,0.95);
+  border:1px solid rgba(139,92,246,0.4);
+  backdrop-filter:blur(20px);
+  color:white; padding:12px 22px; border-radius:14px;
+  font-size:13px; font-weight:600;
+  opacity:0; pointer-events:none; z-index:999;
+  transition:opacity 0.3s, transform 0.3s;
+  white-space:nowrap;
+}
+.toast.show { opacity:1; }
+
+/* ── PROGRESS BAR HERO ─────────────────────────────── */
+.hero-gradient {
+  background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(217,70,239,0.08));
+  border:1px solid rgba(139,92,246,0.2);
+}
+
+/* ── RESPONSIVE ─────────────────────────────────────── */
+@media(max-width:600px) {
+  .g2,.g3 { grid-template-columns:1fr; }
+  .ring-wrap { flex-direction:column; text-align:center; }
+  .ring-meta { justify-content:center; }
+  .ex-grid { grid-template-columns:1fr 1fr; }
+  .main { padding:14px; }
+}
+@media(max-width:400px) {
+  .ex-grid { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="logo">FitLT<sub>Pro</sub></div>
+  <div class="nav-right">
+    <div class="nav-date" id="navDate"></div>
+    <button id="langBtn" onclick="setLang(LANG==='lt'?'en':'lt')" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:#fff;font-size:12px;font-weight:700;padding:4px 10px;cursor:pointer">🇬🇧 EN</button>
+    <div class="premium-badge active" id="premiumBadge" title="Pilna versija — visos funkcijos atrakintos">✨ Pilna</div>
+  </div>
+</nav>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="showTab('dashboard',this)">📊 Suvestinė</button>
+  <button class="tab" onclick="showTab('videos',this)">🎬 Vaizdo Įrašai</button>
+  <button class="tab" onclick="showTab('workout',this)">💪 Treniruotės</button>
+  <button class="tab" onclick="showTab('plan',this)">📅 Dienos Planas</button>
+  <button class="tab" onclick="showTab('nutrition',this)">🥗 Mityba</button>
+  <button class="tab" onclick="showTab('savaitesplanas',this)">🗓️ 2 Sav. Planas</button>
+  <button class="tab" onclick="showTab('receptai',this)">📖 Receptai</button>
+  <button class="tab" onclick="showTab('progress',this)">📈 Pažanga</button>
+</div>
+
+<div class="main">
+
+  <!-- ═══ DASHBOARD ═══ -->
+  <div class="section active" id="tab-dashboard">
+    <div class="card hero-gradient">
+      <div class="card-title" id="lbl_cal_balance">Dienos kalorijų balansas</div>
+      <div class="ring-wrap">
+        <svg width="150" height="150" viewBox="0 0 150 150" style="flex-shrink:0">
+          <defs>
+            <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#8B5CF6"/>
+              <stop offset="100%" stop-color="#D946EF"/>
+            </linearGradient>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="3" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <circle cx="75" cy="75" r="60" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="14"/>
+          <circle cx="75" cy="75" r="60" fill="none" stroke="url(#ringGrad)" stroke-width="14"
+            stroke-linecap="round" stroke-dasharray="377" id="calRing"
+            style="transform:rotate(-90deg);transform-origin:75px 75px;transition:stroke-dashoffset 0.9s cubic-bezier(.4,0,.2,1)"
+            filter="url(#glow)"/>
+          <text x="75" y="69" text-anchor="middle" fill="white" font-size="22" font-weight="900" id="calCenter">0</text>
+          <text x="75" y="86" text-anchor="middle" fill="#94A3B8" font-size="10" id="calGoalTxt">/ 2000 kcal</text>
+        </svg>
+        <div class="ring-info">
+          <h2 id="calNum">0 <span style="font-size:18px;color:var(--text2);font-weight:400">kcal</span></h2>
+          <p id="lbl_eaten">Suvarta šiandien</p>
+          <div class="left" id="calLeft" style="color:var(--g1)">2000 kcal liko</div>
+          <div class="ring-meta">
+            <div class="ring-meta-item">
+              <div class="r-lbl" id="lbl_target">🎯 Tikslas</div>
+              <div class="r-val" id="goalVal">2000</div>
+            </div>
+            <div class="ring-meta-item">
+              <div class="r-lbl" id="lbl_burned">🔥 Sudeginta</div>
+              <div class="r-val" id="burnedVal" style="color:var(--a1)">0</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:14px">
+            <button class="btn btn-sm" id="btn_change_goal" onclick="setGoal()">Keisti tikslą</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="g3">
+      <div class="chip">
+        <div class="chip-ico">🥩</div>
+        <div class="chip-val" id="dashProt">0g</div>
+        <div class="chip-lbl" id="lbl_protein">Baltymai</div>
+      </div>
+      <div class="chip">
+        <div class="chip-ico">🍞</div>
+        <div class="chip-val" id="dashCarb">0g</div>
+        <div class="chip-lbl" id="lbl_carbs">Angliavandeniai</div>
+      </div>
+      <div class="chip">
+        <div class="chip-ico">🥑</div>
+        <div class="chip-val" id="dashFat">0g</div>
+        <div class="chip-lbl" id="lbl_fat">Riebalai</div>
+      </div>
+    </div>
+
+    <div class="g2">
+      <div class="card" style="margin-bottom:0">
+        <div class="card-title" id="lbl_water">💧 Vanduo</div>
+        <div id="lbl_water_goal" style="font-size:12px;color:var(--text2);margin-bottom:10px">Tikslas: 8 stiklinės</div>
+        <div class="water-grid" id="waterGrid"></div>
+        <div style="margin-top:10px;font-size:13px;color:var(--text2)">
+          <span id="waterNum" style="color:var(--text);font-weight:700">0</span> / 8 stiklinių
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:0">
+        <div class="card-title" id="lbl_activity">🏃 Šiandienos aktyvumas</div>
+        <div id="dashAct" style="font-size:13px;color:var(--text2)" data-lkey="dash_no_workouts">Dar nėra treniruočių</div>
+        <div style="margin-top:14px">
+          <div style="font-size:11px;color:var(--text2)" id="lbl_total_burned">Iš viso sudeginta</div>
+          <div style="font-size:28px;font-weight:900;color:var(--a1)" id="dashBurned">0 <span style="font-size:14px;font-weight:400">kcal</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ VIDEOS ═══ -->
+  <div class="section" id="tab-videos">
+    <div class="section-title" id="lbl_ex_library">Pratimų biblioteka 🎬</div>
+    <div class="section-sub" id="lbl_ex_sub">Mokykitės taisyklingos technikos iš ekspertų</div>
+
+    <div class="ex-filters" id="exFilters">
+      <button class="ex-filter active" onclick="filterEx('all',this)" data-lkey="ex_filter_all" data-icon="">Visi</button>
+      <button class="ex-filter" onclick="filterEx('Krūtinė',this)" data-lkey="ex_chest" data-icon="💪">💪 Krūtinė</button>
+      <button class="ex-filter" onclick="filterEx('Kojos',this)" data-lkey="ex_legs" data-icon="🦵">🦵 Kojos</button>
+      <button class="ex-filter" onclick="filterEx('Nugara',this)" data-lkey="ex_back" data-icon="🔙">🔙 Nugara</button>
+      <button class="ex-filter" onclick="filterEx('Pilvas',this)" data-lkey="ex_abs" data-icon="🫁">🫁 Pilvas</button>
+      <button class="ex-filter" onclick="filterEx('Rankos',this)" data-lkey="ex_arms" data-icon="💪">💪 Rankos</button>
+      <button class="ex-filter" onclick="filterEx('Kardio',this)" data-lkey="ex_cardio" data-icon="❤️">❤️ Kardio</button>
+    </div>
+
+    <div class="ex-grid" id="exGrid"></div>
+  </div>
+
+  <!-- ═══ WORKOUT ═══ -->
+  <div class="section" id="tab-workout">
+    <div class="card">
+      <div class="card-title" id="lbl_add_workout">Pridėti treniruotę</div>
+      <div class="form-row">
+        <input class="inp" type="text" id="wName" placeholder="Treniruotės pavadinimas" maxlength="100">
+      </div>
+      <div class="form-row">
+        <select class="inp" id="wType">
+          <option value="Kardio" id="wt0">🏃 Kardio</option>
+          <option value="Jėga" id="wt1">💪 Jėga</option>
+          <option value="Lankstumas" id="wt2">🧘 Lankstumas</option>
+          <option value="Sportas" id="wt3">⚽ Sportas</option>
+          <option value="Kita" id="wt4">🏅 Kita</option>
+        </select>
+        <input class="inp" type="number" id="wDur" placeholder="Trukmė (min)" min="1">
+        <input class="inp" type="number" id="wCal" placeholder="Sudeginta (kcal)" min="0">
+      </div>
+      <div class="form-row">
+        <input class="inp" type="text" id="wNotes" placeholder="Pastabos (pvz. 5km, 3×10...)" maxlength="200">
+        <button class="btn" id="btn_add_workout" onclick="addWorkout()">+ Pridėti</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" id="lbl_quick_templates">Greiti šablonai</div>
+      <div class="quick-wrap">
+        <button class="q-btn" onclick="qWork('Bėgimas 30min','Kardio',30,250)">🏃 Bėgimas 30min</button>
+        <button class="q-btn" onclick="qWork('Jėgos treniruotė','Jėga',60,350)">💪 Jėga 60min</button>
+        <button class="q-btn" onclick="qWork('Dviratis','Kardio',45,300)">🚴 Dviratis 45min</button>
+        <button class="q-btn" onclick="qWork('Plaukimas','Kardio',40,280)">🏊 Plaukimas 40min</button>
+        <button class="q-btn" onclick="qWork('Yoga','Lankstumas',50,120)">🧘 Yoga 50min</button>
+        <button class="q-btn" onclick="qWork('HIIT treniruotė','Kardio',25,320)">🔥 HIIT 25min</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Šiandienos treniruotės</div>
+      <div id="workoutList"></div>
+    </div>
+  </div>
+
+  <!-- ═══ NUTRITION ═══ -->
+  <div class="section" id="tab-nutrition">
+    <div class="card">
+      <div class="card-title" id="lbl_add_food">Pridėti maistą</div>
+      <div class="form-row">
+        <input class="inp" type="text" id="fName" placeholder="Maisto pavadinimas" maxlength="100">
+        <select class="inp" id="fMeal">
+          <option value="Pusryčiai" id="fMeal0">🌅 Pusryčiai</option>
+          <option value="Pietūs" id="fMeal1">☀️ Pietūs</option>
+          <option value="Vakarienė" id="fMeal2">🌙 Vakarienė</option>
+          <option value="Užkandis" id="fMeal3">🍎 Užkandis</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <input class="inp" type="number" id="fCal" placeholder="Kalorijos (kcal)" min="0">
+        <input class="inp" type="number" id="fProt" placeholder="Baltymai (g)" min="0">
+        <input class="inp" type="number" id="fCarb" placeholder="Angliavandeniai (g)" min="0">
+        <input class="inp" type="number" id="fFat" placeholder="Riebalai (g)" min="0">
+      </div>
+      <div class="form-row">
+        <button class="btn" id="btn_add_food" onclick="addFood()">+ Pridėti</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" id="lbl_quick_add">Greitas pridėjimas</div>
+      <div class="quick-wrap">
+        <button class="q-btn" onclick="qFood('Bananas','Užkandis',89,1,23,0)">🍌 Bananas</button>
+        <button class="q-btn" onclick="qFood('Vištiena 150g','Pietūs',248,46,0,5)">🍗 Vištiena</button>
+        <button class="q-btn" onclick="qFood('Avižinė košė','Pusryčiai',150,5,27,3)">🥣 Avižos</button>
+        <button class="q-btn" onclick="qFood('Kiaušiniai 2vnt','Pusryčiai',156,12,1,11)">🥚 Kiaušiniai</button>
+        <button class="q-btn" onclick="qFood('Ryžiai 200g','Pietūs',260,5,57,1)">🍚 Ryžiai</button>
+        <button class="q-btn" onclick="qFood('Griekiniai riešutai','Užkandis',180,4,4,18)">🥜 Riešutai</button>
+        <button class="q-btn" onclick="qFood('Jogurtas 200g','Užkandis',100,10,12,0)">🥛 Jogurtas</button>
+        <button class="q-btn" onclick="qFood('Lašiša 150g','Pietūs',267,38,0,13)">🐟 Lašiša</button>
+      </div>
+    </div>
+
+    <div id="mealSections"></div>
+  </div>
+
+  <!-- ═══ DIENOS PLANAS ═══ -->
+  <div class="section" id="tab-plan">
+    <div id="planContent"></div>
+  </div>
+
+  <!-- ═══ 2 SAVAIČIŲ PLANAS ═══ -->
+  <div class="section" id="tab-savaitesplanas">
+    <div id="savaitesplanasContent"></div>
+  </div>
+
+  <!-- ═══ RECEPTAI ═══ -->
+  <div class="section" id="tab-receptai">
+    <div id="receptaiContent"></div>
+  </div>
+
+  <!-- ═══ PROGRESS ═══ -->
+  <div class="section" id="tab-progress">
+    <div class="card">
+      <div class="card-title" id="lbl_weight_track">⚖️ Svorio sekimas</div>
+      <div class="form-row">
+        <input class="inp" type="number" id="wtInp" placeholder="Svoris (kg)" step="0.1" style="max-width:160px">
+        <button class="btn btn-green" id="btn_log_weight" onclick="logWeight()">Įvesti</button>
+      </div>
+      <div class="chart-wrap"><canvas id="wtChart" height="160"></canvas></div>
+      <div id="wtHistory"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📊 Savaitės kalorijos</div>
+      <div class="chart-wrap"><canvas id="calChart" height="160"></canvas></div>
+    </div>
+
+    <div class="g3">
+      <div class="chip">
+        <div class="chip-ico">🏋️</div>
+        <div class="chip-val" id="statW">0</div>
+        <div class="chip-lbl">Treniruotės</div>
+      </div>
+      <div class="chip">
+        <div class="chip-ico">⏱️</div>
+        <div class="chip-val" id="statM">0</div>
+        <div class="chip-lbl">Minutės</div>
+      </div>
+      <div class="chip">
+        <div class="chip-ico">🔥</div>
+        <div class="chip-val" id="statB">0</div>
+        <div class="chip-lbl">Kcal sudeginta</div>
+      </div>
+    </div>
+
+    <!-- ═══ DUOMENŲ KOPIJA ═══ -->
+    <div class="card">
+      <div class="card-title">💾 Duomenų kopija</div>
+      <div style="color:var(--text2);font-size:12px;line-height:1.5;margin-bottom:14px">
+        Visi tavo duomenys saugomi tik šiame įrenginyje — niekur neišsiunčiami.
+        Išsaugok kopiją, jei keisi telefoną arba valysi naršyklės duomenis.
+      </div>
+      <div class="form-row">
+        <button class="btn btn-green btn-sm" onclick="exportData()">⬇️ Atsisiųsti kopiją</button>
+        <button class="btn-ghost btn-sm" onclick="document.getElementById('importFile').click()">⬆️ Įkelti kopiją</button>
+      </div>
+      <input type="file" id="importFile" accept="application/json,.json" style="display:none" onchange="importData(this)">
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══ EXERCISE MODAL ═══ -->
+<div class="modal-bg" id="exModal" style="display:none" onclick="closeModal('exModal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal('exModal')">✕</button>
+    <div class="ex-modal-hero" id="exHero"></div>
+    <h2 id="exTitle" style="font-size:22px;font-weight:900;margin-bottom:4px"></h2>
+    <div id="exEnglish" style="font-size:13px;color:var(--text2);margin-bottom:12px"></div>
+    <div class="muscles-wrap" id="exMuscles"></div>
+    <div style="display:flex;gap:12px;margin-bottom:20px;font-size:13px;color:var(--text2)">
+      <span>⏱️ <span id="exSets"></span></span>
+      <span>🔧 <span id="exEquip"></span></span>
+    </div>
+
+    <div id="exHowLabel" style="font-size:13px;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text2)">Kaip atlikti</div>
+    <div class="step-list" id="exSteps"></div>
+
+    <div id="exTipsLabel" style="font-size:13px;font-weight:700;margin:16px 0 10px;text-transform:uppercase;letter-spacing:1px;color:var(--g1)">Pagrindiniai patarimai</div>
+    <ul class="tip-list" id="exTips"></ul>
+
+    <div id="exMistakesLabel" style="font-size:13px;font-weight:700;margin:16px 0 10px;text-transform:uppercase;letter-spacing:1px;color:var(--a1)">Dažniausios klaidos</div>
+    <ul class="tip-list" id="exMistakes"></ul>
+
+    <div style="margin-top:24px;display:flex;gap:10px">
+      <a class="btn" style="flex:1;text-align:center;text-decoration:none" id="exYTBtn" href="#" target="_blank" rel="noopener">▶ Žiūrėti YouTube</a>
+      <button class="btn-ghost" id="exCloseBtn" style="flex:1" onclick="closeModal('exModal')">Uždaryti</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══ DATA ═══════════════════════════════════════════════
+const EXERCISES = [
+  {
+    id:'pushup', name:'Atsispaudimai', englishName:'Push-ups', emoji:'🫸',
+    category:'Krūtinė', difficulty:1, equipment:'Nereikia',
+    muscles:['Krūtinė','Tricepsai','Pečiai'], muscles_en:['Chest','Triceps','Shoulders'],
+    sets:'3×10–15 kartų', premium:false,
+    yt:'push+up+proper+form+tutorial+beginners', ytHome:'push+up+namuose+be+inventoriaus+pradedantiesiems', ytGym:'push+up+chest+workout+gym',
+    bg:'linear-gradient(135deg,rgba(244,63,94,0.2),rgba(251,146,60,0.1))',
+    steps:[
+      'Atsigulkite ant pilvo, delnai ties pečiais (šiek tiek plačiau)',
+      'Kūnas turi formuoti tiesią liniją nuo galvos iki kulnų',
+      'Lėtai nuleiskite kūną kol krūtinė beveik paliečia grindis',
+      'Iškvėpkite ir pakelkite kūną atgal į pradinę padėtį',
+      'Šiek tiek sulenkite alkūnes viršuje — nenustokite kontrolės'
+    ],
+    tips:[
+      'Laikykite kūną kaip lentą — viena tiesi linija',
+      'Alkūnės ~45° kampu nuo kūno, ne tiesiai į šonus',
+      'Žiūrėkite žemyn tiesiai, ne į priekį',
+      'Pilvas turi būti įtempta visą laiką'
+    ],
+    mistakes:[
+      'Dubuo per aukštai arba per žemai (kūno lankas)',
+      'Alkūnės plačiai atiderinamos į šonus',
+      'Judėjimas per greitai be kontrolės',
+      'Kvėpavimo laikymas'
+    ]
+  },
+  {
+    id:'squat', name:'Pritūpimai', englishName:'Squats', emoji:'🏋️',
+    category:'Kojos', difficulty:1, equipment:'Nereikia',
+    muscles:['Keturgalvis','Užpakaliniai','Sėdmenys'], muscles_en:['Quads','Hamstrings','Glutes'],
+    sets:'3×12–20 kartų', premium:false,
+    yt:'squat+proper+form+tutorial+beginners', ytHome:'bodyweight+squat+home+workout', ytGym:'barbell+squat+gym+proper+form',
+    bg:'linear-gradient(135deg,rgba(139,92,246,0.2),rgba(217,70,239,0.1))',
+    steps:[
+      'Stojimet tiesiai, kojos pečių plotyje arba šiek tiek platiau',
+      'Pirštai šiek tiek pasisukę į išorę (15–30°)',
+      'Lėtai leiskitės žemyn tartum sėstumėte ant kėdės',
+      'Kelio sąnariai turi eiti kojos pirštų kryptimi',
+      'Leiskitės kol šlaunys bent lygiagrečios su grindimis',
+      'Grįžkite į pradinę padėtį iškvėpdami'
+    ],
+    tips:[
+      'Svoris ant viso pado — neleiskite kulnams kilti',
+      'Nugara tiesi — nesulenkite krūtinės į priekį',
+      'Žvelkite tiesiai į priekį, ne žemyn',
+      'Kelio sąnariai nestumkite į vidų'
+    ],
+    mistakes:[
+      'Kulnai keliasi nuo grindų',
+      'Kelio sąnariai kertami į vidų',
+      'Per siauras stovėjimas',
+      'Nugara sulenkiama pirmyn'
+    ]
+  },
+  {
+    id:'plank', name:'Planka', englishName:'Plank', emoji:'🧘',
+    category:'Pilvas', difficulty:1, equipment:'Nereikia',
+    muscles:['Pilvas','Nugara','Pečiai','Sėdmenys'], muscles_en:['Core','Back','Shoulders','Glutes'],
+    sets:'3×30–60 sekundžių', premium:false,
+    yt:'plank+exercise+proper+form+tutorial',
+    bg:'linear-gradient(135deg,rgba(16,185,129,0.2),rgba(52,211,153,0.1))',
+    steps:[
+      'Atsigulkite ant pilvo, atsiremkite į dilbius',
+      'Pakelkite kūną suformuodami tiesią liniją',
+      'Dilbiai statmenai grindims, alkūnės ties pečiais',
+      'Laikykite padėtį kvėpuodami tolygiai',
+      'Palaipsniui ilginkite trukmę'
+    ],
+    tips:[
+      'Kūnas kaip tiesi lenta — nė lenkimo',
+      'Pilvas įtrauktas ir įtemptas visą laiką',
+      'Sėdmenys nė per aukštai nė per žemai',
+      'Kaklas neutralus — nežiūrėkite nei aukštyn nei žemyn'
+    ],
+    mistakes:[
+      'Dubuo keliamas per aukštai (tilto forma)',
+      'Pilvas nuleistamas žemyn (nugara lanku)',
+      'Kvėpavimo sulaikymas',
+      'Platusis kaklas ištempiamas'
+    ]
+  },
+  {
+    id:'lunge', name:'Išpuoliai', englishName:'Lunges', emoji:'🦵',
+    category:'Kojos', difficulty:1, equipment:'Nereikia',
+    muscles:['Keturgalvis','Sėdmenys','Užpakaliniai'], muscles_en:['Quads','Glutes','Hamstrings'],
+    sets:'3×10 kiekvienai kojai', premium:false,
+    yt:'lunge+exercise+proper+form+tutorial',
+    bg:'linear-gradient(135deg,rgba(245,158,11,0.2),rgba(249,115,22,0.1))',
+    steps:[
+      'Stovėkite tiesiai su kojomis kartu',
+      'Ženkite didelį žingsnį į priekį viena koja',
+      'Lėtai nuleiskite galinės kojos kelį link grindų',
+      'Priekinės kojos kelis turi būti tiesiai virš pado',
+      'Grįžkite į pradinę padėtį ir pakartokite kita koja'
+    ],
+    tips:[
+      'Liemuo tiesus ir stabilus',
+      'Priekinis kelis nesibato per pirštų galus',
+      'Nusileidžiama lėtai ir kontroliuojamai',
+      'Svoris tolygiai paskirstytas'
+    ],
+    mistakes:[
+      'Liemuo krypsta į priekį',
+      'Priekinis kelis eina į vidų',
+      'Per trumpas žingsnis',
+      'Greitas nekontroliuojamas judesys'
+    ]
+  },
+  {
+    id:'crunch', name:'Pilvo preso pratimai', englishName:'Crunches', emoji:'🫀',
+    category:'Pilvas', difficulty:1, equipment:'Nereikia',
+    muscles:['Pilvas (tiesioji)','Šoninis pilvas'], muscles_en:['Abs (straight)','Obliques'],
+    sets:'3×15–25 kartų', premium:false,
+    yt:'crunch+exercise+proper+form+abs+tutorial',
+    bg:'linear-gradient(135deg,rgba(59,130,246,0.2),rgba(99,102,241,0.1))',
+    steps:[
+      'Atsigulkite ant nugaros, sulenkite kelius 90°',
+      'Rankos prie smilkinių arba sukryžiuotos ant krūtinės',
+      'Lėtai pakelkite pečius nuo grindų įtempę pilvą',
+      'Pauzė viršuje — pajuskite pilvo raumenų įtempimą',
+      'Lėtai grįžkite žemyn, bet neatitraukite galvos'
+    ],
+    tips:[
+      'Judėjimas iš pilvo — ne iš kaklo',
+      'Smakras šiek tiek atitrauktas nuo krūtinės',
+      'Nejudinkite kojų ar dubens',
+      'Lėtas ir kontroliuojamas judesys'
+    ],
+    mistakes:[
+      'Traukimas už kaklo rankomis',
+      'Per greitas judesys su impulsu',
+      'Pilnas atsisėdimas (tai yra sit-up, ne crunch)',
+      'Kvėpavimo sulaikymas'
+    ]
+  },
+  // PREMIUM
+  {
+    id:'pullup', name:'Trauksimasis', englishName:'Pull-ups', emoji:'🎯',
+    category:'Nugara', difficulty:2, equipment:'Kartelė',
+    muscles:['Platusis','Bicepsai','Vidurinė nugara'], muscles_en:['Lats','Biceps','Mid Back'],
+    sets:'3×5–10 kartų', premium:true,
+    yt:'pull+up+proper+form+tutorial+beginners',
+    bg:'linear-gradient(135deg,rgba(99,102,241,0.2),rgba(139,92,246,0.1))',
+    steps:[
+      'Laikykitės kartelės viršutine rankena, rankos pečių plotyje',
+      'Pakabinkite tiesiai, pečiai sutraukti žemyn atgal',
+      'Traukite save aukštyn kol smakras virš kartelės',
+      'Pauzė viršuje — spaudžiama nugara',
+      'Lėtai nusileiskite į pradinę padėtį'
+    ],
+    tips:['Nesiūbuokite — statinis judesys','Pečiai nekelkite prie ausų','Kvėpuokite: įkvėpkite žemyn, iškvėpkite aukštyn','Neatitraukite pilvo'],
+    mistakes:['Sūpavimasis ir impulsas','Dalinė amplitudė','Pečiai pakylėti','Per plati rankena']
+  },
+  {
+    id:'deadlift', name:'Negyvasis kelimas', englishName:'Deadlift', emoji:'⚡',
+    category:'Nugara', difficulty:3, equipment:'Svarsčių štanga',
+    muscles:['Nugara','Sėdmenys','Užpakaliniai','Keturgalvis'], muscles_en:['Back','Glutes','Hamstrings','Quads'],
+    sets:'3×5–8 kartų', premium:true,
+    yt:'deadlift+proper+form+tutorial+beginners+barbell', ytHome:'good+morning+exercise+home+no+weights+back', ytGym:'barbell+deadlift+gym+form+tutorial',
+    bg:'linear-gradient(135deg,rgba(244,63,94,0.2),rgba(239,68,68,0.1))',
+    steps:[
+      'Stovėkite ties štanga, kojos pečių plotyje, pirštai po štanga',
+      'Sulenkite kelius ir nusilenkite, suimkite štangą',
+      'Nugara tiesi, krūtinė aukštai, žvilgsnis į priekį',
+      'Pakelkite štangą stumdami žemę kojomis',
+      'Skirtinguose aukštymuose pečiai ir klubai kyla kartu',
+      'Nuleiskite kontroliuojamai atvirkštine tvarka'
+    ],
+    tips:['Štanga laikoma kuo arčiau kūno','Pilvas ir nugara įtempti visą laiką','Niekada neapvaliname nugaros','Pradedame su mažesniu svoriu'],
+    mistakes:['Nugara suapvalinta','Štanga toli nuo kūno','Per greitas kilimas','Galva kelkama per aukštai']
+  },
+  {
+    id:'bench', name:'Gultas spaudimas', englishName:'Bench Press', emoji:'💪',
+    category:'Krūtinė', difficulty:2, equipment:'Suolas + Štanga',
+    muscles:['Krūtinė','Tricepsai','Priekiniai pečiai'], muscles_en:['Chest','Triceps','Front Delts'],
+    sets:'3×8–12 kartų', premium:true,
+    yt:'bench+press+proper+form+tutorial+beginners', ytHome:'push+up+chest+variations+home+no+bench', ytGym:'barbell+bench+press+gym+tutorial',
+    bg:'linear-gradient(135deg,rgba(251,146,60,0.2),rgba(245,158,11,0.1))',
+    steps:[
+      'Atsigulkite ant suolo, pėdos ant grindų',
+      'Suimkite štangą šiek tiek plačiau nei pečių plotis',
+      'Nuleiskite štangą prie apatinės krūtinės dalies',
+      'Paspauskite aukštyn spausdami pečius į suolą',
+      'Nepaleiskite rankų ties viršumi — palikite šiek tiek lenkimo'
+    ],
+    tips:['Pėdos tvirtai ant grindų','Pečiai atsispaudžia į suolą','Alkūnės 45–75° nuo kūno','Kontroliuotas nuleidimas'],
+    mistakes:['Pėdos keliamos','Pečiai atlenkiami nuo suolo','Stiprus atšokimas nuo krūtinės','Alkūnės tiesiai į šonus']
+  },
+  {
+    id:'ohp', name:'Pečių spaudimas', englishName:'Overhead Press', emoji:'🏆',
+    category:'Rankos', difficulty:2, equipment:'Hanteliai / Štanga',
+    muscles:['Pečiai','Tricepsai','Trapecinis'], muscles_en:['Shoulders','Triceps','Traps'],
+    sets:'3×8–12 kartų', premium:true,
+    yt:'overhead+press+proper+form+tutorial+dumbbell', ytHome:'bodyweight+shoulder+pike+push+up+home', ytGym:'dumbbell+overhead+press+gym+tutorial',
+    bg:'linear-gradient(135deg,rgba(16,185,129,0.2),rgba(34,197,94,0.1))',
+    steps:[
+      'Stovėkite tiesiai, kojos pečių plotyje',
+      'Laikykite hantelius ties pečiais, delnai į priekį',
+      'Paspauskite aukštyn iki rankos tiesios viršuje',
+      'Nuleiskite kontroliuojamai atgal prie pečių',
+      'Pilvas įtemptas, nelenkkite į nugaros pusę'
+    ],
+    tips:['Pilvas visada įtemptas','Spauskite tiesiai aukštyn','Kvėpuokite sukoordinuotai','Pradėkite mažu svoriu'],
+    mistakes:['Nugara lenkiama atgal','Rankos kryžkuoja galvą','Per greitas judesys','Alkūnės skleidžiamos į šonus']
+  },
+  {
+    id:'curl', name:'Bicepso traukimas', englishName:'Bicep Curl', emoji:'💪',
+    category:'Rankos', difficulty:1, equipment:'Hanteliai',
+    muscles:['Bicepsas','Dilbiai'], muscles_en:['Biceps','Forearms'],
+    sets:'3×10–15 kartų', premium:true,
+    yt:'bicep+curl+proper+form+tutorial+dumbbell', ytHome:'bodyweight+bicep+curl+home+no+weights+towel', ytGym:'dumbbell+bicep+curl+gym+tutorial',
+    bg:'linear-gradient(135deg,rgba(139,92,246,0.2),rgba(99,102,241,0.1))',
+    steps:[
+      'Stovėkite tiesiai, hanteliai rankose, delnai į priekį',
+      'Alkūnės prie kūno šonų — jos nekuda!',
+      'Kelkite hantelius link pečių sulenkdami alkūnes',
+      'Pauzė viršuje suspausdami bicepsą',
+      'Lėtai nuleiskite kontroliuojamai'
+    ],
+    tips:['Alkūnės nejuda — jos yra atrama','Lėtas nuleidimas svarbesnis nei kilimas','Nesūpuokite kūno','Pilnas judesio diapazonas'],
+    mistakes:['Alkūnės judėjimas pirmyn','Kūno sūpavimas impulsui','Nevisiškas nuleidimas','Per didelis svoris']
+  },
+  {
+    id:'dip', name:'Tricepso atsispaudimai', englishName:'Tricep Dips', emoji:'🔽',
+    category:'Rankos', difficulty:2, equipment:'Suolas arba paralelines',
+    muscles:['Tricepsas','Krūtinė','Pečiai'], muscles_en:['Triceps','Chest','Shoulders'],
+    sets:'3×8–15 kartų', premium:true,
+    yt:'tricep+dips+proper+form+tutorial+beginners',
+    bg:'linear-gradient(135deg,rgba(244,63,94,0.2),rgba(251,113,133,0.1))',
+    steps:[
+      'Atsiriekite rankomis ant suolo, pirštai į priekį',
+      'Kojos ištiestos priekyje arba sulenktos (lengviau)',
+      'Lėtai nusileiskite žemyn sulenkdami alkūnes',
+      'Nusileiskite kol alkūnės ~90° kampas',
+      'Paspauskite atgal aukštyn iki rankos beveik tiesios'
+    ],
+    tips:['Nugara arti suolo — nejudėkite toli','Alkūnės į galą, ne į šonus','Lėtas nuleidimas','Neįvirkite galvos žemyn'],
+    mistakes:['Alkūnės plačiai į šonus','Per greitas judesys','Nesulenkiama iki 90°','Kūnas toli nuo suolo']
+  },
+  {
+    id:'russian', name:'Rusiškas sukimas', englishName:'Russian Twist', emoji:'🌀',
+    category:'Pilvas', difficulty:2, equipment:'Nereikia / Svoriai',
+    muscles:['Šoninis pilvas','Tiesioji pilvo','Stuburas'], muscles_en:['Obliques','Abs','Spine'],
+    sets:'3×20 kartų (10 kiekvienai pusei)', premium:true,
+    yt:'russian+twist+proper+form+tutorial+core',
+    bg:'linear-gradient(135deg,rgba(59,130,246,0.2),rgba(139,92,246,0.1))',
+    steps:[
+      'Sėdėkite ant grindų, kojos sulenktos 45°',
+      'Palinkite atgal ~45° (V formos padėtis)',
+      'Sukite liemenį į dešinę liesdami grindis',
+      'Grįžkite per centrą ir sukite į kairę',
+      'Sunkesnei versijai: laikykite svorį rankomis arba pakelkite kojas'
+    ],
+    tips:['Judesys iš liemens — ne tik rankų','Laikykite nugarą tiesią','Kojos šiek tiek nuo grindų sunkesnei versijai','Kvėpuokite tolygiai'],
+    mistakes:['Judėjimas tik rankomis','Nugara suapvalinta','Per greitas judesys','Kvėpavimo sulaikymas']
+  },
+  {
+    id:'burpee', name:'Burpee', englishName:'Burpee', emoji:'💥',
+    category:'Kardio', difficulty:2, equipment:'Nereikia',
+    muscles:['Visas kūnas','Širdis ir kraujagyslės'], muscles_en:['Full Body','Cardiovascular'],
+    sets:'3×10–15 kartų', premium:true,
+    yt:'burpee+proper+form+tutorial+beginners+cardio',
+    bg:'linear-gradient(135deg,rgba(245,158,11,0.2),rgba(249,115,22,0.1))',
+    steps:[
+      'Stovėkite tiesiai',
+      'Nusileiskite į pritūpimą, delnai ant grindų',
+      'Šoktelkite kojomis atgal į lentą (push-up padėtis)',
+      'Atlikite vieną atsispaudimą (arba praleiskite lengvesnei versijai)',
+      'Šoktelkite kojomis atgal prie rankų',
+      'Šoktelkite aukštyn iškeldami rankas ir grįžkite į pradžią'
+    ],
+    tips:['Pradedantiesiems — be šuolio ir be atsispaudimo','Ritmas svarbesnis nei greitis','Kvėpuokite per visą judesį','Kūnas kontroliuojamas visą laiką'],
+    mistakes:['Per greitas tempas be kontrolės','Nugaros lenkimas lentoje','Neniuokite kojų šuoliu','Kvėpavimo sulaikymas']
+  },
+  {
+    id:'jj', name:'Šuoliai su kojomis', englishName:'Jumping Jacks', emoji:'⭐',
+    category:'Kardio', difficulty:1, equipment:'Nereikia',
+    muscles:['Širdis ir kraujagyslės','Kojos','Pečiai'], muscles_en:['Cardiovascular','Legs','Shoulders'],
+    sets:'3×30–60 sekundžių', premium:true,
+    yt:'jumping+jacks+proper+form+tutorial+cardio',
+    bg:'linear-gradient(135deg,rgba(16,185,129,0.2),rgba(52,211,153,0.1))',
+    steps:[
+      'Stovėkite tiesiai, rankos šonuose',
+      'Šoktelkite išskleisdami kojas į šonus',
+      'Tuo pačiu metu pakelkite rankas iki virš galvos',
+      'Šoktelkite atgal į pradinę padėtį',
+      'Kartokite greitai ir ritmingai'
+    ],
+    tips:['Minkštas nusileidimas — pirštų galai pirmiausia','Laikykite ritmą tolygų','Rankos tiesios aukštyn','Kvėpuokite tolygiai'],
+    mistakes:['Kietas nusileidimas ant viso pado','Netvarkingos rankos','Palinkimas į priekį','Kvėpavimo sulaikymas']
+  },
+  {
+    id:'rdl', name:'Rumuniškas kelimas', englishName:'Romanian Deadlift', emoji:'🏋️',
+    category:'Kojos', difficulty:2, equipment:'Hanteliai / Štanga',
+    muscles:['Užpakaliniai šlaunies','Sėdmenys','Apatinė nugara'], muscles_en:['Hamstrings','Glutes','Lower Back'],
+    sets:'3×10–12 kartų', premium:true,
+    yt:'romanian+deadlift+proper+form+tutorial+dumbbell',
+    bg:'linear-gradient(135deg,rgba(217,70,239,0.2),rgba(139,92,246,0.1))',
+    steps:[
+      'Stovėkite tiesiai, hanteliai priekyje, rankos tiesios',
+      'Lėtai linkite į priekį iš klubų (ne iš juosmens)',
+      'Hanteliai slysta žemyn šlaunimis',
+      'Leiskitės kol pajusite tempimą užpakaliniuose raumenyse',
+      'Grįžkite į pradinę padėtį sutraukdami sėdmenis'
+    ],
+    tips:['Nugara visada tiesi — ne suapvalinta','Hanteliai arti kojų visą laiką','Judesys iš klubų, ne iš juosmens','Pajuskite tempimą — tai yra tikslas'],
+    mistakes:['Nugara suapvalinta','Keliai per daug sulenkti (tampa paprastu kelimas)','Hanteliai toli nuo kojų','Per greitas judesys']
+  },
+  {
+    id:'slunge', name:'Šoninis išpuolis', englishName:'Side Lunge', emoji:'↔️',
+    category:'Kojos', difficulty:2, equipment:'Nereikia',
+    muscles:['Keturgalvis','Sėdmenys','Šlaunies vidus'], muscles_en:['Quads','Glutes','Inner Thigh'],
+    sets:'3×10 kiekvienai kojai', premium:true,
+    yt:'side+lunge+proper+form+tutorial+legs',
+    bg:'linear-gradient(135deg,rgba(251,146,60,0.2),rgba(245,158,11,0.1))',
+    steps:[
+      'Stovėkite tiesiai, kojos kartu',
+      'Ženkite didelį žingsnį į dešinę pusę',
+      'Lenkite dešinį kelį ir sėdėkite žemyn',
+      'Kairė koja lieka tiesi',
+      'Stumkitės atgal ir pakartokite kita puse'
+    ],
+    tips:['Nugara tiesi, krūtinė aukštai','Kelis neperžengia kojų pirštų','Kojos pirštai tiesiai į priekį','Lėtas ir kontroliuojamas judesys'],
+    mistakes:['Nugara lenkiama pirmyn','Kelis per pirštų galus','Per trumpas žingsnis','Kūnas svyruoja']
+  },
+  {
+    id:'row', name:'Hantelio traukimas', englishName:'Dumbbell Row', emoji:'🔄',
+    category:'Nugara', difficulty:2, equipment:'Hantelas + Suolas',
+    muscles:['Platusis','Rombo','Bicepsas'], muscles_en:['Lats','Rhomboids','Biceps'],
+    sets:'3×10–12 kiekvienai pusei', premium:true,
+    yt:'dumbbell+row+proper+form+tutorial+back', ytHome:'bodyweight+row+home+under+table+back', ytGym:'dumbbell+row+gym+back+tutorial',
+    bg:'linear-gradient(135deg,rgba(99,102,241,0.2),rgba(59,130,246,0.1))',
+    steps:[
+      'Atsiriekite viena ranka ir kelio ant suolo',
+      'Kita ranka laikykite hantelį, koja ant grindų',
+      'Nugara lygiagreti grindims, horizontaliai',
+      'Traukite hantelį į šoną šiek tiek atgal',
+      'Pauzė viršuje — spausdami nugaros raumenis',
+      'Lėtai nuleiskite kontroliuojamai'
+    ],
+    tips:['Sukite iš alkūnės, ne iš riešo','Nesukinėkite kūno','Nugara lygiagreti grindims','Spauskite mentę traukdami'],
+    mistakes:['Kūno sukimas impulsui','Rankos rankena per žema','Nevisiškas judesio diapazonas','Alkūnė skleidžiama į šoną']
+  }
+];
+
+// ═══ SAUGI SAUGYKLA ═════════════════════════════════════
+// Privačiame naršymo režime ar užblokavus svetainės duomenis localStorage
+// kreipiniai meta klaidą — tada programa tiesiog veikia be įsiminimo.
+const LS = {
+  get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } }
+};
+
+// ═══ STATE ═══════════════════════════════════════════════
+const today = new Date().toISOString().slice(0,10);
+let ST;
+try {
+  ST = validateST(JSON.parse(LS.get('fitlt_v2')||'null')) || {
+    goal:2000, water:{}, workouts:[], foods:[], weights:[], profile: null
+  };
+} catch(e) {
+  ST = { goal:2000, water:{}, workouts:[], foods:[], weights:[], profile: null };
+}
+// PILNA VERSIJA — visos funkcijos atrakintos, mokėjimų nėra.
+ST.premium = true;
+let PREM = true;
+
+// Saugumo funkcija — išvalo XSS iš vartotojo įvesties
+function esc(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#039;');
+}
+
+// Validuoti duomenis iš localStorage
+function validateST(st) {
+  if (!st || typeof st !== 'object') return null;
+  // Apriboti masyvo dydžius — apsauga nuo localStorage užpildymo
+  if (st.foods && st.foods.length > 5000) st.foods = st.foods.slice(-5000);
+  if (st.workouts && st.workouts.length > 2000) st.workouts = st.workouts.slice(-2000);
+  if (st.weights && st.weights.length > 1000) st.weights = st.weights.slice(-1000);
+  // Tikslas tarp 500-10000
+  if (st.goal && (st.goal < 500 || st.goal > 10000)) st.goal = 2000;
+  return st;
+}
+let currentExYT = '';
+const save = () => LS.set('fitlt_v2', JSON.stringify(ST));
+
+// ═══ KALBOS SISTEMA / LANGUAGE SYSTEM ════════════════════
+let LANG = LS.get('fitlt_lang') || 'lt';
+const setLang = (l) => { LANG = l; LS.set('fitlt_lang', l); applyLang(); };
+
+const TR = {
+  lt: {
+    // NAV
+    nav_date_format: {weekday:'short',month:'short',day:'numeric'},
+    // TABS
+    tab_home: '📊 Suvestinė', tab_videos: '🎬 Vaizdo Įrašai', tab_workout: '💪 Treniruotės',
+    tab_plan: '📅 Dienos Planas', tab_nutrition: '🥗 Mityba', tab_week: '🗓️ 2 Sav. Planas',
+    tab_recipes: '📖 Receptai', tab_progress: '📈 Pažanga',
+    // DASHBOARD
+    dash_cal_balance: 'DIENOS KALORIJŲ BALANSAS', dash_eaten: 'Suvarta šiandien',
+    dash_left: 'liko', dash_target: 'Tikslas', dash_burned: 'Sudeginta',
+    dash_change_goal: 'Keisti tikslą', dash_protein: 'Baltymai', dash_carbs: 'Angliavandeniai',
+    dash_fat: 'Riebalai', dash_water: '💧 VANDUO', dash_water_goal: 'Tikslas: 8 stiklinių',
+    dash_activity: '🏃 ŠIANDIENOS AKTYVUMAS', dash_no_workouts: 'Dar nėra treniruočių',
+    dash_total_burned: 'Iš viso sudeginta',
+    dash_log_workout: '+ Pridėti treniruotę', dash_my_workouts: 'Mano darbai', dash_all: 'Visi →',
+    dash_active: 'Aktyvūs darbai', dash_urgent: 'Skubūs darbai', dash_running: 'Vykdomi projektai',
+    dash_low_stock: 'Trūksta sandėlyje', dash_quick_links: '⚡ Greitos nuorodos',
+    // EXERCISE MODAL
+    ex_how_to: 'Kaip atlikti', ex_tips: 'Pagrindiniai patarimai', ex_mistakes: 'Dažniausios klaidos',
+    ex_watch_yt: '▶ Žiūrėti YouTube', ex_close: 'Uždaryti',
+    ex_free: 'Nemokama', ex_rest: 'Poilsis',
+    ex_filter_all: 'Visi', ex_chest: 'Krūtinė', ex_legs: 'Kojos', ex_back: 'Nugara',
+    ex_abs: 'Pilvas', ex_arms: 'Rankos', ex_cardio: 'Kardio',
+    // WORKOUT TAB
+    wt_add: 'Pridėti treniruotę', wt_name: 'Treniruotės pavadinimas', wt_type: 'Tipas',
+    wt_duration: 'Trukmė (min)', wt_calories: 'Kalorijos (apytiksliai)',
+    wt_notes: 'Pastabos', wt_save: 'Įrašyti', wt_history: 'Istorija',
+    wt_types: ['Jėga','Kardio','Lankstumas','Sportas','Kita'],
+    // NUTRITION TAB
+    nut_add: '+ Pridėti maistą', nut_search: 'Maisto pavadinimas',
+    nut_grams: 'Gramai', nut_cal: 'Kalorijos', nut_prot: 'Baltymai (g)',
+    nut_carb: 'Angliavandeniai (g)', nut_fat: 'Riebalai (g)', nut_add_btn: 'Pridėti',
+    nut_quick: '⚡ Greitai pridėti', nut_today: 'Šiandienos maistas',
+    nut_meals: ['Pusryčiai','Pietūs','Vakarienė','Užkandžiai'],
+    // PROGRESS TAB
+    prog_weight: '⚖️ Svorio sekimas', prog_enter: 'Svoris (kg)', prog_log: 'Įvesti',
+    prog_weekly: '📊 Savaitės kalorijos', prog_workouts: 'Treniruotės',
+    prog_minutes: 'Minutės', prog_calories_burned: 'Kalorijos',
+    // PREMIUM
+    // PLAN
+    plan_personal: 'Tavo asmeninis planas', plan_edit: '✏️ Keisti',
+    plan_kcal_day: 'kcal/dieną', plan_bmi: 'BMI', plan_protein_day: 'Baltymai/dieną',
+    plan_today: 'Šiandien', plan_rest: 'Poilsio diena', plan_rest_msg: 'Kūnas auga ir atsistatoma poilsio metu. Miegok 7-9 val.',
+    plan_workout: 'Šiandienos treniruotė', plan_meal_plan: '🍽️ Mitybos planas',
+    plan_meal_rec: 'Rekomenduojama pagal tavo tikslą',
+    plan_breakfast: 'Pusryčiai', plan_snack: 'Užkandis', plan_lunch: 'Pietūs',
+    plan_afternoon: 'Popietinis užkandis', plan_dinner: 'Vakarienė',
+    plan_ingredients: 'Ingredientai', plan_cooking: 'Gaminimas',
+    plan_nutrition_tips: '🥗 Mitybos patarimai pagal tikslą',
+    // WEEK PLAN
+    week_title: '🗓️ 2 Savaičių planas', week_shopping: '🛒 Apsipirkimo sąrašas',
+    week_print: '🖨️ Spausdinti', week_shopping_title: '🛒 Apsipirkimo sąrašas — 2 savaitės',
+    week_rest: '😌 Poilsis', week1: '1 savaitė', week2: '2 savaitė',
+    week_workout: 'Treniruotė', week_nutrition: 'Mityba',
+    week_home: '🏠 Namai', week_gym: '🏋️ Sporto salė',
+    // ONBOARDING
+    ob_title: 'Sukurkime tavo asmeninį planą', ob_sub: 'Atsakyk į klausimus ir gausite individualų treniruočių ir mitybos planą',
+    ob_gender: 'Lytis', ob_male: '👨 Vyras', ob_female: '👩 Moteris', ob_age: 'Amžius',
+    ob_height: 'Ūgis (cm)', ob_weight: 'Svoris (kg)', ob_goal: 'Tikslas',
+    ob_goal_lose: '🔥 Numesti svorio', ob_goal_muscle: '💪 Auginti raumenis',
+    ob_goal_general: '⚡ Bendra forma', ob_goal_maintain: '⚖️ Palaikyti svorį',
+    ob_location: 'Sporto vieta', ob_home: '🏠 Namai (kūno svoris)', ob_gym: '🏋️ Sporto salė',
+    ob_activity: 'Aktyvumo lygis',
+    ob_activities: ['🛋️ Labai mažas — sėdimas darbas, nesportuoju','🚶 Mažas — sportuoju 1-3 kartus per sav.','🏃 Vidutinis — sportuoju 3-5 kartus per sav.','💪 Aukštas — sportuoju 6-7 kartus per sav.','🔥 Labai aukštas — intensyvus sportas kasdien'],
+    ob_create: '🚀 Sukurti mano asmeninį planą', ob_cancel: 'Atšaukti',
+    ob_toast: '✅ Planas sukurtas! Tikslas:', ob_kcal_day: 'kcal/dieną',
+    // GOAL LABELS
+    goal_lose: 'Svorio metimas 🔥', goal_muscle: 'Raumenų augimas 💪',
+    goal_general: 'Bendra forma ⚡', goal_maintain: 'Svorio palaikymas ⚖️',
+    // BMI
+    bmi_low: 'Per mažas', bmi_normal: 'Norma ✅', bmi_over: 'Antsvoris', bmi_obese: 'Nutukimas',
+    // RECIPES
+    rec_breakfast: 'Pusryčiai 🌅', rec_lunch: 'Pietūs ☀️', rec_dinner: 'Vakarienė 🌙',
+    rec_snack: 'Užkandžiai 🍎', rec_dessert: 'Desertai 🍰', rec_soup: 'Sriubos 🍲',
+    rec_sandwiches: 'Sveikos picos ir sumuštiniai 🥪',
+    rec_ingredients: 'Ingredientai', rec_cooking: 'Gaminimas',
+    // GENERAL
+    video_btn: '▶ Video', rest_day: 'Poilsis', today_label: 'ŠIANDIEN',
+    no_profile: 'Pirma sukurk asmeninį planą', create_plan_btn: 'Sukurti planą',
+    go_to_plan: 'Eik į "Dienos Planas" ir užpildyk savo duomenis',
+  },
+  en: {
+    // NAV
+    nav_date_format: {weekday:'short',month:'short',day:'numeric'},
+    // TABS
+    tab_home: '📊 Dashboard', tab_videos: '🎬 Exercises', tab_workout: '💪 Workouts',
+    tab_plan: '📅 Daily Plan', tab_nutrition: '🥗 Nutrition', tab_week: '🗓️ 2 Week Plan',
+    tab_recipes: '📖 Recipes', tab_progress: '📈 Progress',
+    // DASHBOARD
+    dash_cal_balance: 'DAILY CALORIE BALANCE', dash_eaten: 'Eaten today',
+    dash_left: 'remaining', dash_target: 'Target', dash_burned: 'Burned',
+    dash_change_goal: 'Change goal', dash_protein: 'Protein', dash_carbs: 'Carbs',
+    dash_fat: 'Fat', dash_water: '💧 WATER', dash_water_goal: 'Goal: 8 glasses',
+    dash_activity: '🏃 TODAY\'S ACTIVITY', dash_no_workouts: 'No workouts yet',
+    dash_total_burned: 'Total burned',
+    dash_log_workout: '+ Add workout', dash_my_workouts: 'My workouts', dash_all: 'All →',
+    dash_active: 'Active tasks', dash_urgent: 'Urgent tasks', dash_running: 'Active projects',
+    dash_low_stock: 'Low stock', dash_quick_links: '⚡ Quick links',
+    // EXERCISE MODAL
+    ex_how_to: 'How to do it', ex_tips: 'Key tips', ex_mistakes: 'Common mistakes',
+    ex_watch_yt: '▶ Watch on YouTube', ex_close: 'Close',
+    ex_free: 'Free', ex_rest: 'Rest',
+    ex_filter_all: 'All', ex_chest: 'Chest', ex_legs: 'Legs', ex_back: 'Back',
+    ex_abs: 'Abs', ex_arms: 'Arms', ex_cardio: 'Cardio',
+    // WORKOUT TAB
+    wt_add: 'Add workout', wt_name: 'Workout name', wt_type: 'Type',
+    wt_duration: 'Duration (min)', wt_calories: 'Calories (approx)',
+    wt_notes: 'Notes', wt_save: 'Save', wt_history: 'History',
+    wt_types: ['Strength','Cardio','Flexibility','Sports','Other'],
+    // NUTRITION TAB
+    nut_add: '+ Add food', nut_search: 'Food name',
+    nut_grams: 'Grams', nut_cal: 'Calories', nut_prot: 'Protein (g)',
+    nut_carb: 'Carbs (g)', nut_fat: 'Fat (g)', nut_add_btn: 'Add',
+    nut_quick: '⚡ Quick add', nut_today: "Today's food",
+    nut_meals: ['Breakfast','Lunch','Dinner','Snacks'],
+    // PROGRESS TAB
+    prog_weight: '⚖️ Weight tracking', prog_enter: 'Weight (kg)', prog_log: 'Log',
+    prog_weekly: '📊 Weekly calories', prog_workouts: 'Workouts',
+    prog_minutes: 'Minutes', prog_calories_burned: 'Calories',
+    // PREMIUM
+    // PLAN
+    plan_personal: 'Your personal plan', plan_edit: '✏️ Edit',
+    plan_kcal_day: 'kcal/day', plan_bmi: 'BMI', plan_protein_day: 'Protein/day',
+    plan_today: 'Today', plan_rest: 'Rest day', plan_rest_msg: 'Your body grows and recovers during rest. Sleep 7-9 hours.',
+    plan_workout: "Today's workout", plan_meal_plan: '🍽️ Meal plan',
+    plan_meal_rec: 'Recommended based on your goal',
+    plan_breakfast: 'Breakfast', plan_snack: 'Snack', plan_lunch: 'Lunch',
+    plan_afternoon: 'Afternoon snack', plan_dinner: 'Dinner',
+    plan_ingredients: 'Ingredients', plan_cooking: 'Instructions',
+    plan_nutrition_tips: '🥗 Nutrition tips for your goal',
+    // WEEK PLAN
+    week_title: '🗓️ 2 Week Plan', week_shopping: '🛒 Shopping List',
+    week_print: '🖨️ Print', week_shopping_title: '🛒 Shopping List — 2 weeks',
+    week_rest: '😌 Rest', week1: 'Week 1', week2: 'Week 2',
+    week_workout: 'Workout', week_nutrition: 'Nutrition',
+    week_home: '🏠 Home', week_gym: '🏋️ Gym',
+    // ONBOARDING
+    ob_title: 'Create your personal plan', ob_sub: 'Answer a few questions and get a personalized workout and nutrition plan',
+    ob_gender: 'Gender', ob_male: '👨 Male', ob_female: '👩 Female', ob_age: 'Age',
+    ob_height: 'Height (cm)', ob_weight: 'Weight (kg)', ob_goal: 'Goal',
+    ob_goal_lose: '🔥 Lose weight', ob_goal_muscle: '💪 Build muscle',
+    ob_goal_general: '⚡ General fitness', ob_goal_maintain: '⚖️ Maintain weight',
+    ob_location: 'Workout location', ob_home: '🏠 Home (bodyweight)', ob_gym: '🏋️ Gym',
+    ob_activity: 'Activity level',
+    ob_activities: ['🛋️ Sedentary — desk job, no exercise','🚶 Light — exercise 1-3 times/week','🏃 Moderate — exercise 3-5 times/week','💪 Active — exercise 6-7 times/week','🔥 Very active — intense daily training'],
+    ob_create: '🚀 Create my personal plan', ob_cancel: 'Cancel',
+    ob_toast: '✅ Plan created! Goal:', ob_kcal_day: 'kcal/day',
+    // GOAL LABELS
+    goal_lose: 'Weight Loss 🔥', goal_muscle: 'Muscle Gain 💪',
+    goal_general: 'General Fitness ⚡', goal_maintain: 'Maintain Weight ⚖️',
+    // BMI
+    bmi_low: 'Underweight', bmi_normal: 'Normal ✅', bmi_over: 'Overweight', bmi_obese: 'Obese',
+    // RECIPES
+    rec_breakfast: 'Breakfast 🌅', rec_lunch: 'Lunch ☀️', rec_dinner: 'Dinner 🌙',
+    rec_snack: 'Snacks 🍎', rec_dessert: 'Desserts 🍰', rec_soup: 'Soups 🍲',
+    rec_sandwiches: 'Healthy pizzas & sandwiches 🥪',
+    rec_ingredients: 'Ingredients', rec_cooking: 'Instructions',
+    // GENERAL
+    video_btn: '▶ Video', rest_day: 'Rest', today_label: 'TODAY',
+    no_profile: 'Create your personal plan first', create_plan_btn: 'Create plan',
+    go_to_plan: 'Go to "Daily Plan" and fill in your details',
+  }
+};
+
+function t(key) { return TR[LANG]?.[key] ?? TR.lt[key] ?? key; }
+
+function applyLang() {
+  // Lang button
+  const btn = document.getElementById('langBtn');
+  if (btn) btn.textContent = LANG === 'lt' ? '🇬🇧 EN' : '🇱🇹 LT';
+
+  // Tabs
+  const tabs = {
+    dashboard: t('tab_home'), videos: t('tab_videos'), workout: t('tab_workout'),
+    plan: t('tab_plan'), nutrition: t('tab_nutrition'), savaitesplanas: t('tab_week'),
+    receptai: t('tab_recipes'), progress: t('tab_progress')
+  };
+  document.querySelectorAll('.tab').forEach(tab => {
+    const oc = tab.getAttribute('onclick') || '';
+    const m = oc.match(/showTab\('(\w+)'/);
+    if (m && tabs[m[1]]) tab.textContent = tabs[m[1]];
+  });
+
+  // Static labels map: id -> translation key
+  const staticLabels = {
+    lbl_cal_balance: 'dash_cal_balance', lbl_eaten: 'dash_eaten',
+    lbl_target: 'dash_target', lbl_burned: 'dash_burned',
+    btn_change_goal: 'dash_change_goal',
+    lbl_protein: 'dash_protein', lbl_carbs: 'dash_carbs', lbl_fat: 'dash_fat',
+    lbl_water: 'dash_water', lbl_water_goal: 'dash_water_goal',
+    lbl_activity: 'dash_activity',
+    lbl_ex_library: LANG==='en' ? null : null, // handled below
+    lbl_add_food: 'nut_add', lbl_quick_add: 'nut_quick',
+    btn_add_food: LANG==='en' ? null : null,
+    lbl_add_workout: 'wt_add', lbl_quick_templates: LANG==='en' ? null : null,
+    lbl_weight_track: 'prog_weight',
+    btn_log_weight: 'prog_log',
+    lbl_total_burned: 'dash_total_burned',
+  };
+  Object.entries(staticLabels).forEach(([id, key]) => {
+    if (!key) return;
+    const el = document.getElementById(id);
+    if (el) el.textContent = t(key);
+  });
+
+  // Special cases
+  const exLib = document.getElementById('lbl_ex_library');
+  if (exLib) exLib.textContent = LANG==='en' ? 'Exercise Library 🎬' : 'Pratimų biblioteka 🎬';
+  const exSub = document.getElementById('lbl_ex_sub');
+  if (exSub) exSub.textContent = LANG==='en' ? 'Learn proper technique from experts' : 'Mokykitės taisyklingos technikos iš ekspertų';
+  const addFoodBtn = document.getElementById('btn_add_food');
+  if (addFoodBtn) addFoodBtn.textContent = LANG==='en' ? '+ Add' : '+ Pridėti';
+  const addWorkoutBtn = document.getElementById('btn_add_workout');
+  if (addWorkoutBtn) addWorkoutBtn.textContent = LANG==='en' ? '+ Add' : '+ Pridėti';
+  const qTpl = document.getElementById('lbl_quick_templates');
+  if (qTpl) qTpl.textContent = LANG==='en' ? 'Quick templates' : 'Greiti šablonai';
+
+  // Exercise filter buttons
+  document.querySelectorAll('.ex-filter[data-lkey]').forEach(btn => {
+    const key = btn.getAttribute('data-lkey');
+    const icon = btn.getAttribute('data-icon') || '';
+    btn.textContent = icon ? icon + ' ' + t(key) : t(key);
+  });
+
+  // Share button if exists
+  const shareBtn = document.getElementById('shareBtn');
+  if (shareBtn) shareBtn.textContent = LANG==='en' ? '🔗 Share' : '🔗 Dalintis';
+
+  // Form placeholders
+  const phs = {
+    fName: LANG==='en'?'Food name':'Maisto pavadinimas',
+    fCal: LANG==='en'?'Calories (kcal)':'Kalorijos (kcal)',
+    fProt: LANG==='en'?'Protein (g)':'Baltymai (g)',
+    fCarb: LANG==='en'?'Carbs (g)':'Angliavandeniai (g)',
+    fFat: LANG==='en'?'Fat (g)':'Riebalai (g)',
+    wName: LANG==='en'?'Workout name':'Treniruotės pavadinimas',
+    wDur: LANG==='en'?'Duration (min)':'Trukmė (min)',
+    wCal: LANG==='en'?'Calories burned (kcal)':'Sudeginta (kcal)',
+    wNotes: LANG==='en'?'Notes (e.g. 5km, 3×10...)':'Pastabos (pvz. 5km, 3×10...)',
+    wtInp: LANG==='en'?'Weight (kg)':'Svoris (kg)',
+  };
+  Object.entries(phs).forEach(([id,ph]) => { const el=document.getElementById(id); if(el) el.placeholder=ph; });
+
+  // Meal dropdown options
+  const meals_lt = ['🌅 Pusryčiai','☀️ Pietūs','🌙 Vakarienė','🍎 Užkandis'];
+  const meals_en = ['🌅 Breakfast','☀️ Lunch','🌙 Dinner','🍎 Snack'];
+  [0,1,2,3].forEach(i => {
+    const el = document.getElementById('fMeal'+i);
+    if (el) el.textContent = LANG==='en' ? meals_en[i] : meals_lt[i];
+  });
+
+  // Workout type dropdown
+  const wt_lt = ['🏃 Kardio','💪 Jėga','🧘 Lankstumas','⚽ Sportas','🏅 Kita'];
+  const wt_en = ['🏃 Cardio','💪 Strength','🧘 Flexibility','⚽ Sports','🏅 Other'];
+  [0,1,2,3,4].forEach(i => {
+    const el = document.getElementById('wt'+i);
+    if (el) el.textContent = LANG==='en' ? wt_en[i] : wt_lt[i];
+  });
+
+  // Lbl_target needs emoji prefix
+  const tgt = document.getElementById('lbl_target');
+  if (tgt) tgt.textContent = LANG==='en' ? '🎯 Target' : '🎯 Tikslas';
+  const brn = document.getElementById('lbl_burned');
+  if (brn) brn.textContent = LANG==='en' ? '🔥 Burned' : '🔥 Sudeginta';
+  const act = document.getElementById('lbl_activity');
+  if (act) act.textContent = LANG==='en' ? "🏃 TODAY'S ACTIVITY" : '🏃 ŠIANDIENOS AKTYVUMAS';
+  const waterLbl = document.getElementById('lbl_water');
+  if (waterLbl) waterLbl.textContent = LANG==='en' ? '💧 Water' : '💧 Vanduo';
+  const waterGoal = document.getElementById('lbl_water_goal');
+  if (waterGoal) waterGoal.textContent = LANG==='en' ? 'Goal: 8 glasses' : 'Tikslas: 8 stiklinės';
+
+  // Re-render dynamic sections
+  renderDashboard();
+  renderPlan();
+  renderExercises();
+  renderReceptai();
+  if (document.getElementById('tab-savaitesplanas')?.classList.contains('active')) renderSavaitesPlanas();
+}
+
+// ═══ NAV DATE ═══════════════════════════════════════════
+document.getElementById('navDate').textContent =
+  new Date().toLocaleDateString('lt-LT',{weekday:'short',month:'short',day:'numeric'});
+
+// ═══ TABS ═══════════════════════════════════════════════
+function showTab(id, el) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  el.classList.add('active');
+  if(id==='progress') setTimeout(drawCharts,50);
+  if(id==='savaitesplanas') renderSavaitesPlanas();
+  if(id==='receptai') renderReceptai();
+  if(id==='plan') renderPlan();
+}
+
+// ═══ MODAL ══════════════════════════════════════════════
+function openModal(id) { document.getElementById(id).style.display='flex'; document.body.style.overflow='hidden'; }
+function closeModal(id) { document.getElementById(id).style.display='none'; document.body.style.overflow=''; }
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal('exModal'); });
+
+// ═══ TOAST ══════════════════════════════════════════════
+function toast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+
+
+// ═══ WATER ══════════════════════════════════════════════
+function renderWater() {
+  const n = ST.water[today]||0;
+  const g = document.getElementById('waterGrid');
+  g.innerHTML='';
+  for(let i=0;i<8;i++){
+    const d=document.createElement('div');
+    d.className='w-dot'+(i<n?' on':'');
+    d.textContent='💧';
+    d.onclick=()=>{ ST.water[today]=i<n?i:i+1; save(); renderWater(); };
+    g.appendChild(d);
+  }
+  document.getElementById('waterNum').textContent=n;
+}
+
+// ═══ EXERCISES ══════════════════════════════════════════
+let currentFilter='all';
+function filterEx(cat, el) {
+  currentFilter=cat;
+  document.querySelectorAll('.ex-filter').forEach(f=>f.classList.remove('active'));
+  el.classList.add('active');
+  renderExercises();
+}
+const CAT_MAP_EN = {'Chest':'Krūtinė','Legs':'Kojos','Back':'Nugara','Abs':'Pilvas','Arms':'Rankos','Cardio':'Kardio'};
+const DAY_LT_EN = {'Pirmadienis':'Monday','Antradienis':'Tuesday','Trečiadienis':'Wednesday','Ketvirtadienis':'Thursday','Penktadienis':'Friday','Šeštadienis':'Saturday','Sekmadienis':'Sunday'};
+const FOCUS_EN = {'Viršutinė kūno dalis 💪':'Upper Body 💪','Kojos ir sėdmenys 🦵':'Legs & Glutes 🦵','Kardio + Pilvas 🔥':'Cardio + Core 🔥','Nugara ir bicepsai 🎯':'Back & Biceps 🎯','Visas kūnas 💥':'Full Body 💥','Lengvas kardio 🚶':'Light Cardio 🚶','Poilsis ir atstatymas 😌':'Rest & Recovery 😌','Krūtinė + Tricepsai 💪':'Chest + Triceps 💪','Viršutinė dalis 💪':'Upper Body 💪','Pilvas + Core 🧘':'Abs + Core 🧘','Intervalinis kardio 🔥':'Interval Cardio 🔥','Intervalinis kardio 💥':'Interval Cardio 💥','Visas kūnas aktyviai 💥':'Full Body Active 💥','Visas kūnas tempas 🏃':'Full Body Pace 🏃','Poilsis 😌':'Rest 😌'};
+function trDay(l) { return LANG==='en' ? (DAY_LT_EN[l]||l) : l; }
+function trFocus(f) { return LANG==='en' ? (FOCUS_EN[f]||f) : f; }
+function renderExercises() {
+  const filterLt = LANG==='en' && CAT_MAP_EN[currentFilter] ? CAT_MAP_EN[currentFilter] : currentFilter;
+  const list = currentFilter==='all' ? EXERCISES : EXERCISES.filter(e=>e.category===filterLt);
+  const grid = document.getElementById('exGrid');
+  grid.innerHTML = list.map(ex=>{
+    const stars = '★'.repeat(ex.difficulty)+'☆'.repeat(3-ex.difficulty);
+    return `<div class="ex-card" onclick="openEx('${ex.id}')">
+      <div class="ex-card-thumb" style="background:${ex.bg}">
+        <span>${ex.emoji}</span>
+      </div>
+      <div class="ex-card-body">
+        <div class="ex-card-name">${LANG==='en'&&ex.englishName?ex.englishName:ex.name}</div>
+        <div class="ex-card-sub">${(LANG==='en'&&ex.muscles_en?ex.muscles_en:ex.muscles).slice(0,2).join(' · ')}</div>
+        <div class="ex-card-meta">
+          <span class="stars" title="${ex.difficulty}/3 sunkumas">${stars}</span>
+          <span class="badge b-g" style="font-size:9px">${ex.equipment}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openEx(id) {
+  const ex = EXERCISES.find(e=>e.id===id);
+  if(!ex) return;
+  const loc = ST.profile?.location || 'namai';
+  const ytQ = loc === 'sale' ? (ex.ytGym || ex.yt) : (ex.ytHome || ex.yt);
+  currentExYT = ytQ;
+  const ytBtn = document.getElementById('exYTBtn');
+  if (ytBtn) {
+    ytBtn.href = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(ytQ);
+    ytBtn.textContent = t('ex_watch_yt');
+  }
+  const closeBtn = document.getElementById('exCloseBtn');
+  if (closeBtn) closeBtn.textContent = t('ex_close');
+  ['exHowLabel','exTipsLabel','exMistakesLabel'].forEach((id,i) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = t(['ex_how_to','ex_tips','ex_mistakes'][i]);
+  });
+  document.getElementById('exHero').style.background = ex.bg;
+  document.getElementById('exHero').innerHTML = `<span style="font-size:64px">${ex.emoji}</span>`;
+  const showEN = LANG === 'en';
+  document.getElementById('exTitle').textContent = showEN ? ex.englishName : ex.name;
+  document.getElementById('exEnglish').textContent = showEN ? ex.name : ex.englishName;
+  document.getElementById('exSets').textContent = ex.sets;
+  document.getElementById('exEquip').textContent = ex.equipment;
+  document.getElementById('exMuscles').innerHTML = ex.muscles.map(m=>`<span class="badge b-p">${m}</span>`).join('');
+  document.getElementById('exSteps').innerHTML = ex.steps.map(s=>`
+    <div class="step-item">
+      <div class="step-num">${ex.steps.indexOf(s)+1}</div>
+      <div class="step-txt">${s}</div>
+    </div>`).join('');
+  document.getElementById('exTips').innerHTML = ex.tips.map(t=>`<li class="tip-item">${t}</li>`).join('');
+  document.getElementById('exMistakes').innerHTML = ex.mistakes.map(m=>`<li class="tip-item mistake-item">${m}</li>`).join('');
+  openModal('exModal');
+}
+function openYT() {
+  window.open('https://www.youtube.com/results?search_query='+currentExYT,'_blank');
+}
+
+// ═══ WORKOUTS ═══════════════════════════════════════════
+function addWorkout() {
+  const n=document.getElementById('wName').value.trim();
+  if(!n){ toast('⚠️ Įveskite pavadinimą!'); return; }
+  const type=document.getElementById('wType').value;
+  const dur=parseInt(document.getElementById('wDur').value)||0;
+  const cal=parseInt(document.getElementById('wCal').value)||0;
+  const notes=document.getElementById('wNotes').value.trim();
+  ST.workouts.push({id:Date.now(),date:today,name:n,type,duration:dur,calories:cal,notes});
+  save(); renderWorkouts(); renderDashboard();
+  ['wName','wDur','wCal','wNotes'].forEach(id=>document.getElementById(id).value='');
+  toast('💪 Treniruotė pridėta!');
+}
+function qWork(n,t,d,c){ ST.workouts.push({id:Date.now(),date:today,name:n,type:t,duration:d,calories:c,notes:''}); save(); renderWorkouts(); renderDashboard(); toast('✅ '+n+' pridėta!'); }
+function delWork(id){ ST.workouts=ST.workouts.filter(w=>w.id!==id); save(); renderWorkouts(); renderDashboard(); }
+
+function renderWorkouts() {
+  const list=document.getElementById('workoutList');
+  const tw=ST.workouts.filter(w=>w.date===today);
+  if(!tw.length){ list.innerHTML='<div class="empty"><div class="empty-ico">🏋️</div><p>Dar nėra šiandienos treniruočių.<br>Pridėkite pirmą treniruotę!</p></div>'; return; }
+  const tc={'Kardio':'b-r','Jėga':'b-p','Lankstumas':'b-g','Sportas':'b-y','Kita':'b-b'};
+  list.innerHTML=tw.map(w=>`
+    <div class="li">
+      <div class="li-l">
+        <div class="li-title"><span class="badge ${tc[w.type]||'b-p'}">${esc(w.type)}</span>${esc(w.name)}</div>
+        <div class="li-sub">${w.duration?w.duration+' min':''}${w.calories?' · '+w.calories+' kcal':''}${w.notes?' · '+esc(w.notes):''}</div>
+      </div>
+      <button class="btn btn-sm btn-danger" onclick="delWork(${w.id})">✕</button>
+    </div>`).join('');
+}
+
+// ═══ FOODS ══════════════════════════════════════════════
+function addFood() {
+  const n=document.getElementById('fName').value.trim();
+  if(!n){ toast('⚠️ Įveskite maisto pavadinimą!'); return; }
+  const cal=parseInt(document.getElementById('fCal').value)||0;
+  if(!cal){ toast('⚠️ Įveskite kalorijų kiekį!'); return; }
+  const meal=document.getElementById('fMeal').value;
+  const prot=parseFloat(document.getElementById('fProt').value)||0;
+  const carb=parseFloat(document.getElementById('fCarb').value)||0;
+  const fat=parseFloat(document.getElementById('fFat').value)||0;
+  ST.foods.push({id:Date.now(),date:today,name:n,meal,cal,prot,carb,fat});
+  save(); renderFoods(); renderDashboard();
+  ['fName','fCal','fProt','fCarb','fFat'].forEach(id=>document.getElementById(id).value='');
+  toast('🥗 Maistas pridėtas!');
+}
+function qFood(n,m,c,p,cb,f){ ST.foods.push({id:Date.now(),date:today,name:n,meal:m,cal:c,prot:p,carb:cb,fat:f}); save(); renderFoods(); renderDashboard(); toast('✅ '+n+' pridėtas!'); }
+function delFood(id){ ST.foods=ST.foods.filter(f=>f.id!==id); save(); renderFoods(); renderDashboard(); }
+
+function renderFoods() {
+  const meals=['Pusryčiai','Pietūs','Vakarienė','Užkandis'];
+  const icons={'Pusryčiai':'🌅','Pietūs':'☀️','Vakarienė':'🌙','Užkandis':'🍎'};
+  const tf=ST.foods.filter(f=>f.date===today);
+  document.getElementById('mealSections').innerHTML=meals.map(meal=>{
+    const items=tf.filter(f=>f.meal===meal);
+    const tot=items.reduce((s,f)=>s+f.cal,0);
+    return `<div class="card">
+      <div class="meal-hdr"><span class="meal-name">${icons[meal]} ${meal}</span><span class="meal-cal">${tot} kcal</span></div>
+      ${items.length?items.map(f=>`<div class="li">
+        <div class="li-l">
+          <div class="li-title">${esc(f.name)}</div>
+          <div class="li-sub">${f.cal} kcal${f.prot?' · B:'+f.prot+'g':''}${f.carb?' · AV:'+f.carb+'g':''}${f.fat?' · R:'+f.fat+'g':''}</div>
+        </div>
+        <button class="btn btn-sm btn-danger" onclick="delFood(${f.id})">✕</button>
+      </div>`).join(''):'<div style="color:var(--text3);font-size:13px;padding:6px 0">Nieko nepridėta</div>'}
+    </div>`;
+  }).join('');
+}
+
+// ═══ WEIGHT ═════════════════════════════════════════════
+function logWeight() {
+  const v=parseFloat(document.getElementById('wtInp').value);
+  if(!v||v<1){ toast('⚠️ Įveskite svorį!'); return; }
+  ST.weights=ST.weights.filter(w=>w.date!==today);
+  ST.weights.push({date:today,weight:v});
+  ST.weights.sort((a,b)=>a.date.localeCompare(b.date));
+  save(); renderProgress(); drawCharts(); toast('⚖️ Svoris: '+v+' kg įvestas!');
+  document.getElementById('wtInp').value='';
+}
+
+function renderProgress() {
+  const all=ST.workouts;
+  document.getElementById('statW').textContent=all.length;
+  document.getElementById('statM').textContent=all.reduce((s,w)=>s+w.duration,0);
+  document.getElementById('statB').textContent=all.reduce((s,w)=>s+w.calories,0);
+  const last5=ST.weights.slice(-5).reverse();
+  document.getElementById('wtHistory').innerHTML=last5.length?last5.map(w=>`
+    <div class="wt-entry">
+      <span>${new Date(w.date).toLocaleDateString('lt-LT',{month:'short',day:'numeric'})}</span>
+      <strong>${w.weight} kg</strong>
+    </div>`).join(''):'<div style="color:var(--text3);font-size:13px;margin-top:8px">Dar nėra svorio įrašų</div>';
+}
+
+// ═══ DASHBOARD ══════════════════════════════════════════
+function renderDashboard() {
+  const tf=ST.foods.filter(f=>f.date===today);
+  const tw=ST.workouts.filter(w=>w.date===today);
+  const tc=tf.reduce((s,f)=>s+f.cal,0);
+  const tp=tf.reduce((s,f)=>s+f.prot,0);
+  const tcb=tf.reduce((s,f)=>s+f.carb,0);
+  const tf2=tf.reduce((s,f)=>s+f.fat,0);
+  const burned=tw.reduce((s,w)=>s+w.calories,0);
+  const left=ST.goal-tc+burned;
+
+  document.getElementById('calNum').innerHTML=tc+' <span style="font-size:18px;color:var(--text2);font-weight:400">kcal</span>';
+  document.getElementById('calCenter').textContent=tc;
+  document.getElementById('calGoalTxt').textContent='/ '+ST.goal;
+  document.getElementById('calLeft').textContent=(left>=0?left+' kcal '+(LANG==='en'?'remaining':'liko'):Math.abs(left)+' kcal '+(LANG==='en'?'over':'per daug'));
+  document.getElementById('calLeft').style.color=left>=0?'var(--g1)':'var(--a1)';
+  document.getElementById('goalVal').textContent=ST.goal+' kcal';
+  document.getElementById('burnedVal').textContent=burned+' kcal';
+  document.getElementById('dashProt').textContent=Math.round(tp)+'g';
+  document.getElementById('dashCarb').textContent=Math.round(tcb)+'g';
+  document.getElementById('dashFat').textContent=Math.round(tf2)+'g';
+  document.getElementById('dashBurned').innerHTML=burned+' <span style="font-size:14px;font-weight:400">kcal</span>';
+
+  const pct=Math.min(tc/ST.goal,1);
+  document.getElementById('calRing').style.strokeDashoffset=377-(377*pct);
+
+  document.getElementById('dashAct').innerHTML=tw.length
+    ?tw.map(w=>`<div style="margin-bottom:4px;font-size:13px">✅ ${esc(w.name)} (${parseInt(w.duration)||0}min)</div>`).join('')
+    :`<span style="color:var(--text3)">${LANG==='en'?'No workouts yet':'Dar nėra treniruočių'}</span>`;
+
+  renderWater();
+}
+
+function setGoal() {
+  const v=prompt(LANG==='en'?'Daily calorie goal:':'Dienos kalorijų tikslas:',ST.goal);
+  if(v&&!isNaN(v)&&parseInt(v)>0){ ST.goal=parseInt(v); save(); renderDashboard(); toast('🎯 Tikslas: '+v+' kcal'); }
+}
+
+// ═══ CHARTS ═════════════════════════════════════════════
+function drawCharts() {
+  drawWtChart();
+  drawCalChart();
+}
+
+function drawWtChart() {
+  const cv=document.getElementById('wtChart');
+  const ctx=cv.getContext('2d');
+  const W=cv.offsetWidth||400, H=160;
+  cv.width=W*2; cv.height=H*2; ctx.scale(2,2);
+  ctx.clearRect(0,0,W,H);
+
+  const data=ST.weights.slice(-10);
+  if(data.length<2){
+    ctx.fillStyle='#64748B'; ctx.font='13px sans-serif'; ctx.textAlign='center';
+    ctx.fillText('Reikia bent 2 svorio įrašų grafikui',W/2,H/2); return;
+  }
+  const vals=data.map(d=>d.weight);
+  const minV=Math.min(...vals)-1, maxV=Math.max(...vals)+1;
+  const PAD={l:44,r:16,t:16,b:28};
+  const cw=W-PAD.l-PAD.r, ch=H-PAD.t-PAD.b;
+  const px=i=>PAD.l+i/(vals.length-1)*cw;
+  const py=v=>PAD.t+(1-(v-minV)/(maxV-minV))*ch;
+
+  // grid lines
+  ctx.strokeStyle='rgba(255,255,255,0.04)'; ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const y=PAD.t+i/4*ch;
+    ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(W-PAD.r,y);ctx.stroke();
+    const v=maxV-(i/4)*(maxV-minV);
+    ctx.fillStyle='#64748B'; ctx.font='9px sans-serif'; ctx.textAlign='right';
+    ctx.fillText(v.toFixed(1),PAD.l-4,y+3);
+  }
+
+  // gradient fill
+  const grad=ctx.createLinearGradient(0,PAD.t,0,H-PAD.b);
+  grad.addColorStop(0,'rgba(139,92,246,0.35)');
+  grad.addColorStop(1,'rgba(139,92,246,0.01)');
+  ctx.beginPath();
+  ctx.moveTo(px(0),py(vals[0]));
+  vals.forEach((v,i)=>{if(i>0)ctx.lineTo(px(i),py(v));});
+  ctx.lineTo(px(vals.length-1),H-PAD.b);
+  ctx.lineTo(px(0),H-PAD.b);
+  ctx.closePath(); ctx.fillStyle=grad; ctx.fill();
+
+  // line
+  ctx.strokeStyle='#8B5CF6'; ctx.lineWidth=2.5; ctx.lineJoin='round';
+  ctx.beginPath();
+  vals.forEach((v,i)=>i===0?ctx.moveTo(px(i),py(v)):ctx.lineTo(px(i),py(v)));
+  ctx.stroke();
+
+  // dots + labels
+  vals.forEach((v,i)=>{
+    const x=px(i),y=py(v);
+    ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);
+    ctx.fillStyle='#1A1A2E';ctx.fill();
+    ctx.strokeStyle='#8B5CF6';ctx.lineWidth=2;ctx.stroke();
+    ctx.fillStyle='#F1F0FF';ctx.font='bold 9px sans-serif';ctx.textAlign='center';
+    ctx.fillText(v+'kg',x,y-8);
+    ctx.fillStyle='#64748B';ctx.font='9px sans-serif';
+    ctx.fillText(data[i].date.slice(5),x,H-PAD.b+10);
+  });
+}
+
+function drawCalChart() {
+  const cv=document.getElementById('calChart');
+  const ctx=cv.getContext('2d');
+  const W=cv.offsetWidth||400, H=160;
+  cv.width=W*2; cv.height=H*2; ctx.scale(2,2);
+  ctx.clearRect(0,0,W,H);
+
+  const days=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date(); d.setDate(d.getDate()-i);
+    const key=d.toISOString().slice(0,10);
+    const cal=ST.foods.filter(f=>f.date===key).reduce((s,f)=>s+f.cal,0);
+    days.push({label:d.toLocaleDateString('lt-LT',{weekday:'short'}),cal,key});
+  }
+
+  const maxCal=Math.max(...days.map(d=>d.cal),ST.goal,100);
+  const PAD={l:8,r:8,t:16,b:24};
+  const bw=(W-PAD.l-PAD.r)/days.length-6;
+  const ch=H-PAD.t-PAD.b;
+
+  // goal line
+  const goalY=PAD.t+(1-ST.goal/maxCal)*ch;
+  ctx.setLineDash([5,4]);ctx.strokeStyle='rgba(139,92,246,0.4)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(PAD.l,goalY);ctx.lineTo(W-PAD.r,goalY);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='rgba(139,92,246,0.7)';ctx.font='9px sans-serif';ctx.textAlign='left';
+  ctx.fillText('Tikslas',PAD.l+2,goalY-3);
+
+  days.forEach((d,i)=>{
+    const x=PAD.l+i*(bw+6)+3;
+    const bh=Math.max((d.cal/maxCal)*ch,2);
+    const y=PAD.t+(1-d.cal/maxCal)*ch;
+    const isToday=d.key===today;
+
+    const grad=ctx.createLinearGradient(0,y,0,PAD.t+ch);
+    if(d.cal>ST.goal){
+      grad.addColorStop(0,'#F43F5E');grad.addColorStop(1,'rgba(244,63,94,0.1)');
+    } else if(isToday){
+      grad.addColorStop(0,'#8B5CF6');grad.addColorStop(1,'rgba(139,92,246,0.1)');
+    } else {
+      grad.addColorStop(0,'rgba(139,92,246,0.6)');grad.addColorStop(1,'rgba(139,92,246,0.05)');
+    }
+
+    ctx.fillStyle=grad;
+    ctx.beginPath();
+    if(ctx.roundRect) ctx.roundRect(x,y,bw,bh,[4,4,0,0]);
+    else { ctx.rect(x,y,bw,bh); }
+    ctx.fill();
+
+    ctx.fillStyle=isToday?'#fff':'#94A3B8';
+    ctx.font=isToday?'bold 10px sans-serif':'9px sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText(d.label,x+bw/2,H-PAD.b+10);
+    if(d.cal>0){ ctx.fillStyle='#fff';ctx.font='9px sans-serif';ctx.fillText(d.cal,x+bw/2,y-4); }
+  });
+}
+
+// ═══ DIENOS PLANAS ═══════════════════════════════════════
+
+const WEEK_PLANS = [
+  { label:'Pirmadienis', focus:'Viršutinė kūno dalis 💪', exercises:[
+    {id:'pushup',sets:'4×12',rest:'60s'}, {id:'ohp',sets:'3×10',rest:'90s'},
+    {id:'curl',sets:'3×12',rest:'60s'}, {id:'dip',sets:'3×10',rest:'60s'},
+    {id:'plank',sets:'3×45s',rest:'30s'}
+  ]},
+  { label:'Antradienis', focus:'Kojos ir sėdmenys 🦵', exercises:[
+    {id:'squat',sets:'4×15',rest:'90s'}, {id:'lunge',sets:'3×12',rest:'60s'},
+    {id:'rdl',sets:'3×10',rest:'90s'}, {id:'slunge',sets:'3×10',rest:'60s'},
+    {id:'russian',sets:'3×20',rest:'45s'}
+  ]},
+  { label:'Trečiadienis', focus:'Kardio + Pilvas 🔥', exercises:[
+    {id:'burpee',sets:'4×12',rest:'60s'}, {id:'jj',sets:'3×45s',rest:'30s'},
+    {id:'crunch',sets:'4×20',rest:'45s'}, {id:'plank',sets:'4×45s',rest:'30s'},
+    {id:'russian',sets:'3×20',rest:'45s'}
+  ]},
+  { label:'Ketvirtadienis', focus:'Nugara ir bicepsai 🎯', exercises:[
+    {id:'pullup',sets:'4×6',rest:'120s'}, {id:'row',sets:'3×12',rest:'90s'},
+    {id:'deadlift',sets:'3×6',rest:'120s'}, {id:'curl',sets:'3×12',rest:'60s'},
+    {id:'plank',sets:'3×45s',rest:'30s'}
+  ]},
+  { label:'Penktadienis', focus:'Visas kūnas 💥', exercises:[
+    {id:'squat',sets:'3×12',rest:'90s'}, {id:'pushup',sets:'3×12',rest:'60s'},
+    {id:'row',sets:'3×12',rest:'90s'}, {id:'lunge',sets:'3×10',rest:'60s'},
+    {id:'burpee',sets:'3×10',rest:'60s'}
+  ]},
+  { label:'Šeštadienis', focus:'Lengvas kardio 🚶', exercises:[
+    {id:'jj',sets:'4×60s',rest:'30s'}, {id:'crunch',sets:'3×20',rest:'45s'},
+    {id:'plank',sets:'3×60s',rest:'30s'}, {id:'lunge',sets:'3×12',rest:'60s'},
+    {id:'russian',sets:'3×20',rest:'45s'}
+  ]},
+  { label:'Sekmadienis', focus:'Poilsis ir atstatymas 😌', exercises:[] }
+];
+
+// Recipe translation helpers
+function rName(r) { const e=REN[r.name]; return LANG==='en'&&e ? e.n : r.name; }
+function rIng(r)  { const e=REN[r.name]; return LANG==='en'&&e?.i ? e.i : (r.ing||[]); }
+function rSteps(r){ const e=REN[r.name]; return LANG==='en'&&e?.s ? e.s : (r.steps||[]); }
+
+// REN = Recipe English Names/Ingredients/Steps
+const REN = {
+  // ── BREAKFAST ─────────────────────────────────────────────
+  'Avižiniai dribsniai su uogomis':{n:'Oatmeal with Berries',i:['100g oats','200ml milk','handful frozen berries','1 tbsp honey'],s:['Pour milk over oats','Heat 2 min in microwave','Top with berries and honey']},
+  'Kiaušinienė su daržovėmis':{n:'Vegetable Scrambled Eggs',i:['3 eggs','1/2 bell pepper','handful spinach','1 tomato','olive oil'],s:['Sauté vegetables in oil','Pour in beaten eggs','Cook until set']},
+  'Graikiškas jogurtas su granola':{n:'Greek Yogurt with Granola',i:['200g Greek yogurt','50g granola','1 banana','honey to taste'],s:['Put yogurt in bowl','Add granola','Top with banana slices and honey']},
+  'Varškės sumuštinis':{n:'Cottage Cheese Toast',i:['2 slices rye bread','150g low-fat cottage cheese','cucumber','dill'],s:['Toast the bread','Spread with cottage cheese','Top with cucumber slices and dill']},
+  'Bananų kokteilis':{n:'Banana Protein Shake',i:['1 banana','200ml milk','1 tbsp protein powder','handful ice'],s:['Add all ingredients to blender','Blend until smooth','Pour and drink immediately']},
+  'Blynutėliai su medumi':{n:'Pancakes with Honey',i:['2 eggs','150g flour','200ml milk','1 tsp baking powder','honey'],s:['Mix dry and wet ingredients','Cook on hot pan','Serve with honey']},
+  'Juodosios duonos skrebučiai su avokadu':{n:'Rye Avocado Toast',i:['2 slices rye bread','1 avocado','lemon juice','salt','pepper'],s:['Toast the bread','Mash avocado with lemon juice','Spread on toast']},
+  'Varškės apkepas':{n:'Cottage Cheese Casserole',i:['400g cottage cheese','3 eggs','100g flour','sugar','vanilla'],s:['Mix all ingredients','Pour into baking pan','Bake at 180°C for 25 min']},
+  // ── BREAKFAST EXTRA ────────────────────────────────────────
+  'Skramblinti kiaušiniai su lašiša':{n:'Scrambled Eggs with Salmon',i:['3 eggs','50g smoked salmon','cream','dill','butter'],s:['Melt butter in pan','Add eggs with cream','Stir until set','Top with salmon and dill']},
+  'Šokolado proteino kokteilius':{n:'Chocolate Protein Shake',i:['1 banana','1 tbsp protein powder','200ml milk','1 tbsp cocoa','ice'],s:['Add all to blender','Blend 30 sec','Pour and serve']},
+  'Kviečių košė su obuoliu':{n:'Wheat Porridge with Apple',i:['80g wheat porridge','200ml milk','1 apple','cinnamon','honey'],s:['Cook porridge in milk','Grate the apple','Mix with cinnamon and honey']},
+  // ── LUNCH ──────────────────────────────────────────────────
+  'Vištienos sriuba su daržovėmis':{n:'Chicken Vegetable Soup',i:['300g chicken','2 carrots','2 potatoes','onion','parsley'],s:['Boil chicken in broth','Add vegetables','Cook 20 min, garnish with parsley']},
+  'Ryžiai su lašiša':{n:'Salmon Rice Bowl',i:['150g salmon fillet','150g rice','broccoli','soy sauce','sesame'],s:['Cook rice','Pan-fry salmon 4 min each side','Steam broccoli','Assemble in bowl']},
+  'Makaronai su kalakutiena':{n:'Turkey Pasta',i:['200g pasta','200g turkey','tomato sauce','garlic','basil'],s:['Cook pasta','Sauté turkey with garlic','Add tomato sauce','Mix with pasta']},
+  'Graikų salotos':{n:'Greek Salad',i:['lettuce','tomatoes','cucumbers','feta cheese','olives','olive oil'],s:['Chop vegetables','Add feta and olives','Drizzle with oil']},
+  'Lęšių troškinys':{n:'Red Lentil Stew',i:['200g red lentils','canned tomatoes','onion','cumin','turmeric'],s:['Sauté onion with spices','Add tomatoes and lentils','Simmer 25 min']},
+  'Vištienos krūtinėlė su bulvėmis':{n:'Chicken Breast with Potatoes',i:['250g chicken breast','300g potatoes','rosemary','garlic','olive oil'],s:['Season chicken and potatoes with spices','Bake at 200°C for 30 min']},
+  'Tonų salotos su kiaušiniu':{n:'Tuna Egg Salad',i:['1 can tuna','2 boiled eggs','lettuce','tomato','yogurt dressing'],s:['Boil eggs','Mix all ingredients','Season with yogurt dressing']},
+  'Vegetariška pica (naminė)':{n:'Homemade Vegetarian Pizza',i:['pizza dough','tomato sauce','mozzarella','bell pepper','mushrooms','basil'],s:['Spread sauce on dough','Add cheese and vegetables','Bake at 220°C for 15 min']},
+  'Avižų košė su daržovėmis (sūrus)':{n:'Savory Oatmeal with Vegetables',i:['100g oats','spinach','leek','egg','soy sauce'],s:['Cook oats','Sauté vegetables separately','Mix together, top with egg']},
+  'Burokėlių sriuba (barščiai)':{n:'Borscht (Beet Soup)',i:['2 beets','1 carrot','cabbage','potatoes','sour cream'],s:['Cook vegetables in broth','Blend half the soup','Serve with sour cream']},
+  // ── LUNCH EXTRA ────────────────────────────────────────────
+  'Cezario salotos su vištiena':{n:'Caesar Salad with Chicken',i:['200g chicken breast','romaine lettuce','parmesan','croutons','caesar dressing'],s:['Cook chicken','Mix salad ingredients','Top with chicken and dressing']},
+  'Žirnių sriuba':{n:'Pea Soup',i:['300g peas','onion','carrot','parsley','smoked ribs'],s:['Soak peas overnight','Cook in broth 30 min','Blend part of soup']},
+  'Kepti ryžiai su kiaušiniu':{n:'Fried Rice with Egg',i:['200g cooked rice','2 eggs','carrots','green peas','soy sauce'],s:['Sauté vegetables','Add rice','Break in eggs and stir']},
+  'Grietinės sriuba':{n:'Cream of Potato Soup',i:['potatoes','onion','carrots','sour cream','dill'],s:['Cook vegetables','Stir in sour cream at end','Garnish with dill']},
+  // ── DINNER ─────────────────────────────────────────────────
+  'Kepta lašiša su brokoliais':{n:'Baked Salmon with Broccoli',i:['200g salmon','200g broccoli','lemon juice','dill','olive oil'],s:['Season salmon','Bake at 180°C for 15 min','Steam broccoli 8 min','Serve with lemon']},
+  'Kalakutienos kotletai':{n:'Turkey Patties',i:['300g ground turkey','onion','egg','breadcrumbs','spices'],s:['Mix ground meat with ingredients','Form patties','Pan-fry 5 min each side']},
+  'Daržovių troškinys su tofu':{n:'Tofu Vegetable Stir-Fry',i:['200g tofu','zucchini','bell pepper','onion','soy sauce','coconut oil'],s:['Pan-fry tofu until golden','Add vegetables','Simmer with soy sauce 15 min']},
+  'Orkaitėje keptos vištienos šlaunelės':{n:'Oven-Baked Chicken Thighs',i:['4 chicken thighs','garlic powder','paprika','rosemary','salt'],s:['Season with spices','Place in baking dish','Bake at 190°C for 40 min']},
+  'Mintinga salotos su krevečių':{n:'Hearty Shrimp Salad',i:['200g shrimp','lettuce','avocado','cherry tomatoes','lemon-honey dressing'],s:['Sauté shrimp 3 min','Mix salad ingredients','Top with shrimp and dressing']},
+  'Vištienos wok su ryžiais':{n:'Chicken Wok with Rice',i:['200g chicken','carrots','bell peppers','bean sprouts','soy sauce','150g rice'],s:['Cook rice','Stir-fry chicken in hot pan','Add vegetables and soy sauce','Cook 5 more min']},
+  'Žuvies kotletai':{n:'Fish Patties',i:['300g white fish fillet','egg','herbs','breadcrumbs','lemon'],s:['Chop fish finely','Mix with egg and herbs','Pan-fry until golden']},
+  'Cukinijų lazanija':{n:'Zucchini Lasagna',i:['2 zucchinis','300g ground meat','tomato sauce','mozzarella','parmesan'],s:['Slice zucchini into strips','Layer with meat and sauce','Bake at 180°C for 35 min']},
+  // ── DINNER EXTRA ───────────────────────────────────────────
+  'Maltos mėsos pyragas':{n:'Shepherd\'s Pie',i:['400g ground meat','potatoes','carrots','onion','egg','milk'],s:['Boil potatoes and mash','Sauté meat with vegetables','Layer and bake at 180°C for 35 min']},
+  'Krevetės su česnaku ir makaronais':{n:'Garlic Shrimp Pasta',i:['200g shrimp','200g pasta','4 garlic cloves','olive oil','parsley'],s:['Cook pasta','Sauté shrimp with garlic','Toss with pasta and parsley']},
+  'Orkaitėje keptos daržovės':{n:'Oven-Roasted Vegetables',i:['bell pepper','zucchini','eggplant','tomato','garlic','rosemary'],s:['Chop vegetables','Season with oil and herbs','Roast at 200°C for 25 min']},
+  // ── SNACKS ─────────────────────────────────────────────────
+  'Obuolys su žemės riešutų sviestu':{n:'Apple with Peanut Butter'},
+  'Graikiškas jogurtas':{n:'Greek Yogurt'},
+  'Sauja mišrių riešutų':{n:'Mixed Nuts'},
+  'Varškė su medumi':{n:'Cottage Cheese with Honey'},
+  'Bananas':{n:'Banana'},
+  'Ryžių krekeriai su sūriu':{n:'Rice Crackers with Cheese'},
+  'Kiaušinis (virtas)':{n:'Boiled Egg'},
+  'Uogos su grietinėle':{n:'Berries with Cream'},
+  'Avokadas ant ryžinės duonelės':{n:'Avocado on Rice Cake'},
+  'Proteininis batonėlis':{n:'Protein Bar'},
+  'Morkos su humusu':{n:'Carrots with Hummus'},
+  'Kokteiliniai pomidorai su mocarela':{n:'Cherry Tomatoes with Mozzarella'},
+  // ── SNACKS EXTRA ───────────────────────────────────────────
+  'Naminiai granolų batonėliai':{n:'Homemade Granola Bars',i:['200g oats','honey','nuts','dried fruit','coconut oil'],s:['Mix all ingredients','Spread on baking tray','Bake at 160°C for 20 min','Cut into bars']},
+  'Humuso dippas su daržovėmis':{n:'Hummus with Vegetable Sticks',i:['hummus','carrots','cucumber','bell pepper','celery'],s:['Cut vegetables into sticks','Serve with hummus']},
+  'Graikiniai riešutai su džiovintomis spanguolėmis':{n:'Walnuts with Dried Cranberries'},
+  'Proteininis ledų kokteilius':{n:'Protein Ice Cream Shake',i:['frozen banana','protein powder','milk'],s:['Freeze banana slices','Blend with milk and protein']},
+  // ── DESSERTS ───────────────────────────────────────────────
+  'Šokoladinis avokado pudingas':{n:'Chocolate Avocado Pudding',i:['2 avocados','3 tbsp cocoa','4 tbsp honey','vanilla extract','milk'],s:['Mash avocados','Add cocoa, honey and vanilla','Blend until smooth','Refrigerate 30 min']},
+  'Naminiai blynai su uogomis':{n:'Crepes with Berries',i:['200g flour','2 eggs','300ml milk','sugar','berries','sour cream'],s:['Mix batter','Cook thin crepes','Serve with berries and sour cream']},
+  'Varškės pyragas':{n:'Cheesecake',i:['500g cottage cheese','3 eggs','150g sugar','100g flour','vanilla','lemon zest'],s:['Mix cottage cheese with eggs','Add sugar and flour','Bake at 170°C for 40 min']},
+  'Jogurto ir uogų popsai':{n:'Yogurt Berry Popsicles',i:['300g Greek yogurt','honey','frozen berries','coconut flakes'],s:['Mix yogurt with honey','Add berries','Pour into molds and freeze 4 hrs']},
+  'Bananų ledai (2 ingr.)':{n:'2-Ingredient Banana Ice Cream',i:['2 frozen bananas','pinch of salt'],s:['Freeze banana pieces','Blend until ice cream consistency']},
+  'Avižinis obuolių pyragas':{n:'Oat Apple Cake',i:['200g oats','3 apples','100g sugar','2 eggs','cinnamon','baking powder'],s:['Mix dry and wet ingredients','Grate apples','Bake at 180°C for 35 min']},
+  'Šokolado trufiai':{n:'Chocolate Truffles',i:['200g dark chocolate','100ml cream','cocoa for coating'],s:['Melt chocolate with cream','Refrigerate 2 hrs','Form into balls','Roll in cocoa']},
+  'Naminiai sausainiai':{n:'Homemade Cookies',i:['200g flour','100g butter','80g sugar','1 egg','vanilla'],s:['Cream butter with sugar','Add egg and flour','Shape cookies','Bake at 180°C for 12 min']},
+  // ── SOUPS ──────────────────────────────────────────────────
+  'Pomidorų grietinėlės sriuba':{n:'Creamy Tomato Soup',i:['1kg tomatoes','onion','garlic cloves','cream','basil'],s:['Cook tomatoes with onion','Blend smooth','Add cream','Serve with basil']},
+  'Grybų sriuba':{n:'Mushroom Soup',i:['300g mushrooms','onion','carrot','sour cream','dill','flour'],s:['Sauté mushrooms with onion','Add broth','Thicken with flour','Stir in sour cream']},
+  'Šaltibarščiai':{n:'Cold Beet Soup',i:['cooked/canned beets','kefir','egg','cucumber','dill'],s:['Grate beets','Pour kefir over','Add vegetables and egg','Chill']},
+  'Žuvies sriuba':{n:'Fish Chowder',i:['300g salmon','potatoes','leek','cream','dill'],s:['Cook potatoes in broth','Add fish','Cook 10 more min','Stir in cream']},
+  // ── SANDWICHES ─────────────────────────────────────────────
+  'Avokado toastas su kiaušiniu':{n:'Avocado Egg Toast',i:['2 bread slices','1 avocado','2 eggs','salt','lemon'],s:['Toast bread','Mash avocado','Fry eggs','Layer everything']},
+  'Kalakutienos Klubinis':{n:'Turkey Club Sandwich',i:['3 bread slices','150g turkey','lettuce','tomato','mayonnaise','cheese'],s:['Toast bread','Layer turkey and vegetables']},
+  'Pica ant cukinijos':{n:'Zucchini Pizza',i:['2 zucchinis (halved)','tomato sauce','mozzarella','basil'],s:['Hollow out zucchini','Spread sauce','Add cheese','Bake at 190°C for 15 min']},
+  'Varškės sūrelio sumuštinis':{n:'Cream Cheese Sandwich',i:['2 slices rye bread','cream cheese','cucumber','dill','garlic'],s:['Mix cream cheese with garlic','Spread on bread','Top with cucumber and dill']},
+};
+
+const RECIPES = {
+  breakfast: [
+    {name:'Avižiniai dribsniai su uogomis', cal:320, pro:12, carb:54, fat:7, time:'5 min', emoji:'🥣',
+     ing:['100g avižinių dribsnių','200ml pieno','Sauja šaldytų uogų','1 v.š. medaus'], steps:['Avižas užpilkite pienu','Pašildykite 2 min mikrobangų krosnyje','Užpilkite uogomis ir medumi']},
+    {name:'Kiaušinienė su daržovėmis', cal:280, pro:20, carb:8, fat:18, time:'10 min', emoji:'🍳',
+     ing:['3 kiaušiniai','1/2 paprikos','Sauja špinatų','1 pomidoras','Alyvuogių aliejus'], steps:['Pakepinkite daržoves aliejuje','Supilkite išplaktus kiaušinius','Kepkite kol sukietėja']},
+    {name:'Graikiškas jogurtas su granola', cal:350, pro:18, carb:45, fat:9, time:'2 min', emoji:'🥛',
+     ing:['200g graikiško jogurto','50g granolų','1 bananas','Medus pagal skonį'], steps:['Į dubenį dėkite jogurtą','Užberkite granolų','Papuoškite bananų skiltelėmis ir medumi']},
+    {name:'Varškės sumuštinis', cal:260, pro:22, carb:28, fat:6, time:'5 min', emoji:'🫙',
+     ing:['2 riekelės juodos duonos','150g liesos varškės','Agurkas','Krapai'], steps:['Duoną paskrudinikite tosterio','Aptepkite varške','Uždėkite agurkų žiedų ir krapų']},
+    {name:'Bananų kokteilis', cal:290, pro:15, carb:48, fat:4, time:'3 min', emoji:'🍌',
+     ing:['1 bananas','200ml pieno','1 šaukštas proteino miltelių','Sauja ledų'], steps:['Visus ingredientus sudėkite į blenderį','Fraplite iki vientisos masės','Pilkite į stiklinę ir gerkite iš karto']},
+    {name:'Blynutėliai su medumi', cal:380, pro:14, carb:60, fat:10, time:'20 min', emoji:'🥞',
+     ing:['2 kiaušiniai','150g miltų','200ml pieno','1 šaukštelis kepimo miltelių','Medus'], steps:['Sumaišykite sausus ir drėgnus ingredientus','Kepkite karštoje keptuvėje','Patiekite su medumi']},
+    {name:'Juodosios duonos skrebučiai su avokadu', cal:310, pro:8, carb:35, fat:16, time:'5 min', emoji:'🥑',
+     ing:['2 riekelės juodos duonos','1 avokadas','Citrinų sultys','Druska, pipiriai'], steps:['Duoną paskrudinikite','Avokadą ištrinkite su citrinų sultimis','Aptepkite skrebučius']},
+    {name:'Varškės apkepas', cal:340, pro:25, carb:38, fat:8, time:'30 min', emoji:'🧁',
+     ing:['400g varškės','3 kiaušiniai','100g miltų','Cukrus','Vanilinas'], steps:['Sumaišykite visus ingredientus','Dėkite į kepimo formą','Kepkite 180°C 25 min']},
+  ],
+  lunch: [
+    {name:'Vištienos sriuba su daržovėmis', cal:320, pro:28, carb:25, fat:8, time:'30 min', emoji:'🍲',
+     ing:['300g vištienos','2 morkos','2 bulvės','Svogūnas','Petražolės'], steps:['Virkite vištieną sultinyje','Pridėkite daržoves','Virkite 20 min, patroškite petražolėmis']},
+    {name:'Ryžiai su lašiša', cal:450, pro:35, carb:48, fat:12, time:'25 min', emoji:'🍱',
+     ing:['150g lašišos filė','150g ryžių','Brokoliai','Sojos padažas','Sezamas'], steps:['Išvirkite ryžius','Kepkite lašišą 4 min kiekvienoje pusėje','Garinkite brokolius','Surinkite lėkštėje']},
+    {name:'Makaronai su kalakutiena', cal:480, pro:38, carb:55, fat:10, time:'20 min', emoji:'🍝',
+     ing:['200g makaronų','200g kalakutienos','Pomidorų padažas','Česnakai','Bazilikas'], steps:['Išvirkite makaronus','Pakepinkite kalakutieną su česnakais','Pridėkite pomidorų padažą','Sumaišykite su makaronais']},
+    {name:'Graikų salotos', cal:280, pro:12, carb:18, fat:18, time:'10 min', emoji:'🥗',
+     ing:['Salotos','Pomidorai','Agurkai','Fetos sūris','Alyvuogės','Alyvuogių aliejus'], steps:['Supjaustykite daržoves','Suberkite fetos sūrį ir alyvuoges','Apšlakstykite aliejumi']},
+    {name:'Lęšių troškinys', cal:350, pro:18, carb:52, fat:6, time:'35 min', emoji:'🍛',
+     ing:['200g raudonųjų lęšių','Pomidorai skardinėje','Svogūnas','Kmynai','Ciberžolė'], steps:['Pakepinkite svogūną su prieskoniais','Pridėkite pomidorus ir lęšius','Troškinkite 25 min']},
+    {name:'Vištienos krūtinėlė su bulvėmis', cal:420, pro:40, carb:38, fat:9, time:'35 min', emoji:'🍗',
+     ing:['250g vištienos krūtinėlės','300g bulvių','Rozmarinas','Česnakai','Alyvuogių aliejus'], steps:['Vištieną ir bulves pagardinkite prieskoniais','Kepkite orkaitėje 200°C 30 min']},
+    {name:'Tonų salotos su kiaušiniu', cal:310, pro:32, carb:12, fat:14, time:'10 min', emoji:'🥫',
+     ing:['1 skardinė tonų','2 kiaušiniai (virta)','Salotos','Pomidoras','Jogurtų padažas'], steps:['Išvirkite kiaušinius','Sumaišykite visus ingredientus','Pagardinkite jogurto padažu']},
+    {name:'Vegetariška pica (naminė)', cal:480, pro:20, carb:65, fat:14, time:'40 min', emoji:'🍕',
+     ing:['Picos tešla','Pomidorų padažas','Mocarela','Paprika','Grybai','Bazilikas'], steps:['Ant tešlos tepkite padažą','Uždėkite sūrį ir daržoves','Kepkite 220°C 15 min']},
+    {name:'Avižų košė su daržovėmis (sūrus)', cal:290, pro:12, carb:45, fat:7, time:'15 min', emoji:'🥬',
+     ing:['100g avižų','Špinatai','Poras','Kiaušinis','Sojos padažas'], steps:['Išvirkite avižas','Atskirai pakepinkite daržoves','Sumaišykite, uždėkite kiaušinį virš']},
+    {name:'Burokėlių sriuba (barščiai)', cal:180, pro:6, carb:28, fat:4, time:'40 min', emoji:'🍵',
+     ing:['2 burokėliai','1 morka','Kopūstas','Bulvės','Grietinė'], steps:['Išvirkite daržoves sultinyje','Trintovas pusę sriubos','Patiekite su grietine']},
+  ],
+  dinner: [
+    {name:'Kepta lašiša su brokoliais', cal:380, pro:40, carb:15, fat:18, time:'20 min', emoji:'🐟',
+     ing:['200g lašišos','200g brokolių','Citrinos sultys','Krapai','Alyvuogių aliejus'], steps:['Lašišą pagardinkite','Kepkite 180°C 15 min','Garinkite brokolius 8 min','Patiekite su citrinos sultimis']},
+    {name:'Kalakutienos kotletai', cal:320, pro:35, carb:12, fat:14, time:'25 min', emoji:'🍖',
+     ing:['300g kalakutienos faršo','Svogūnas','Kiaušinis','Duonos trupiniai','Prieskoniai'], steps:['Sumaišykite faršą su ingredientais','Formuokite kotletus','Kepkite keptuvėje 5 min kiekvienoje pusėje']},
+    {name:'Daržovių troškinys su tofu', cal:260, pro:16, carb:28, fat:10, time:'25 min', emoji:'🥦',
+     ing:['200g tofu','Cukinija','Paprika','Svogūnas','Sojos padažas','Kokosų aliejus'], steps:['Pakepinkite tofu iki auksinės','Pridėkite daržoves','Troškinkite su sojos padažu 15 min']},
+    {name:'Orkaitėje keptos vištienos šlaunelės', cal:350, pro:32, carb:5, fat:22, time:'45 min', emoji:'🍗',
+     ing:['4 vištienos šlaunelės','Česnakų milteliai','Paprika','Rozmarinas','Druska'], steps:['Pagardinkite prieskoniais','Dėkite į kepimo formą','Kepkite 190°C 40 min']},
+    {name:'Mintinga salotos su krevečių', cal:290, pro:28, carb:12, fat:14, time:'15 min', emoji:'🦐',
+     ing:['200g krevečių','Salotos','Avokadas','Cherrių pomidorai','Citrinos-medaus padažas'], steps:['Pakepinkite krevetines 3 min','Sumaišykite salotų ingredientus','Uždėkite krevetines ir padažą']},
+    {name:'Vištienos wok su ryžiais', cal:420, pro:35, carb:48, fat:10, time:'20 min', emoji:'🥡',
+     ing:['200g vištienos','Morkos','Paprikos','Sojos daigai','Sojos padažas','150g ryžių'], steps:['Išvirkite ryžius','Kepkite vištieną karštoje keptuvėje','Pridėkite daržoves ir sojos padažą','Kepkite dar 5 min']},
+    {name:'Žuvies kotletai', cal:280, pro:30, carb:15, fat:10, time:'25 min', emoji:'🐠',
+     ing:['300g baltos žuvies filė','Kiaušinis','Žolelės','Duonos trupiniai','Citrinas'], steps:['Susmulkinkite žuvį','Sumaišykite su kiaušiniu ir žolelėmis','Kepkite keptuvėje']},
+    {name:'Cukinijų lazanija', cal:340, pro:22, carb:28, fat:14, time:'50 min', emoji:'🍆',
+     ing:['2 cukinijos','300g faršo','Pomidorų padažas','Mocarela','Parmezanas'], steps:['Supjaustykite cukiniją pleistrais','Klokite sluoksnius su faršu ir padažu','Kepkite 180°C 35 min']},
+  ],
+  snack: [
+    {name:'Obuolys su žemės riešutų sviestu', cal:200, pro:5, carb:28, fat:9, time:'2 min', emoji:'🍎'},
+    {name:'Graikiškas jogurtas', cal:130, pro:15, carb:8, fat:3, time:'1 min', emoji:'🥛'},
+    {name:'Sauja mišrių riešutų', cal:180, pro:5, carb:7, fat:16, time:'1 min', emoji:'🥜'},
+    {name:'Varškė su medumi', cal:150, pro:16, carb:14, fat:2, time:'2 min', emoji:'🍯'},
+    {name:'Bananas', cal:105, pro:1, carb:27, fat:0, time:'1 min', emoji:'🍌'},
+    {name:'Ryžių krekeriai su sūriu', cal:160, pro:8, carb:22, fat:4, time:'2 min', emoji:'🧀'},
+    {name:'Kiaušinis (virtas)', cal:78, pro:6, carb:0, fat:5, time:'8 min', emoji:'🥚'},
+    {name:'Uogos su grietinėle', cal:120, pro:2, carb:16, fat:5, time:'2 min', emoji:'🍓'},
+    {name:'Avokadas ant ryžinės duonelės', cal:170, pro:3, carb:18, fat:10, time:'3 min', emoji:'🥑'},
+    {name:'Proteininis batonėlis', cal:200, pro:20, carb:22, fat:5, time:'1 min', emoji:'🍫'},
+    {name:'Morkos su humusu', cal:140, pro:5, carb:18, fat:5, time:'2 min', emoji:'🥕'},
+    {name:'Kokteiliniai pomidorai su mocarela', cal:130, pro:8, carb:5, fat:8, time:'2 min', emoji:'🍅'},
+  ]
+};
+
+function renderPlan() {
+  const dayIdx = new Date().getDay(); // 0=Sun, 1=Mon...
+  const planIdx = dayIdx === 0 ? 6 : dayIdx - 1; // 0=Mon...6=Sun
+  const plan = WEEK_PLANS[planIdx];
+  const goal = ST.goal || 2000;
+  const isRest = plan.exercises.length === 0;
+
+  // Pick today's meals (rotate by day)
+  const d = new Date().getDate();
+  const bf = RECIPES.breakfast[d % RECIPES.breakfast.length];
+  const ln = RECIPES.lunch[d % RECIPES.lunch.length];
+  const dn = RECIPES.dinner[d % RECIPES.dinner.length];
+  const sn1 = RECIPES.snack[d % RECIPES.snack.length];
+  const sn2 = RECIPES.snack[(d+3) % RECIPES.snack.length];
+  const totalCal = bf.cal + ln.cal + dn.cal + sn1.cal + sn2.cal;
+
+  const exMap = {};
+  EXERCISES.forEach(e => exMap[e.id] = e);
+
+  let html = `
+  <div class="card" style="background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(217,70,239,0.1));border-color:rgba(139,92,246,0.3)">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px">${trDay(plan.label)}</div>
+        <div style="font-size:20px;font-weight:800;margin-top:4px">${trFocus(plan.focus)}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:11px;color:var(--text2)">Treniruotė</div>
+        <div style="font-size:16px;font-weight:800;color:var(--p1)">${isRest ? '—' : plan.exercises.length+' pratimai'}</div>
+      </div>
+    </div>
+  </div>`;
+
+  // WORKOUT
+  if (isRest) {
+    html += `<div class="card" style="text-align:center;padding:40px 20px">
+      <div style="font-size:56px">😌</div>
+      <div style="font-size:20px;font-weight:800;margin-top:16px">${t('plan_rest')}</div>
+      <div style="color:var(--text2);margin-top:8px;font-size:14px">Kūnas atsistato ir auga poilsio metu. Išsimiegokite, suvalgykite gerai ir atsipalaiduokite.</div>
+    </div>`;
+  } else {
+    html += `<div class="card">
+      <div class="card-title">💪 ${t('plan_workout')}</div>`;
+    plan.exercises.forEach((ex, i) => {
+      const e = exMap[ex.id];
+      if (!e) return;
+      const loc = ST.profile?.location || 'namai';
+      const ytQ = loc === 'sale' ? (e.ytGym || e.yt) : (e.ytHome || e.yt);
+      const ytUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(ytQ)}`;
+      html += `
+      <div class="li">
+        <div style="font-size:28px;margin-right:14px">${e.emoji}</div>
+        <div class="li-l">
+          <div class="li-title">${LANG==='en'&&e.englishName?e.englishName:e.name}</div>
+          <div class="li-sub">${ex.sets} · ${t('ex_rest')}: ${ex.rest} · ${(LANG==='en'&&e.muscles_en?e.muscles_en:e.muscles).join(', ')}</div>
+        </div>
+        <a href="${ytUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()"
+           style="background:rgba(255,0,0,0.15);border:1px solid rgba(255,0,0,0.3);border-radius:8px;padding:6px 10px;color:#FF4444;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap;display:inline-block">
+          ▶ Video
+        </a>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // NUTRITION PLAN
+  const mealHtml = (meal, label, icon) => {
+    const _steps = rSteps(meal);
+    const _ing   = rIng(meal);
+    const steps = _steps.length ? _steps.map((s,i)=>`<div style="padding:4px 0;font-size:12px;color:var(--text2)"><span style="color:var(--p1);font-weight:700">${i+1}.</span> ${s}</div>`).join('') : '';
+    const ing   = _ing.length   ? _ing.map(i=>`<span style="background:rgba(255,255,255,0.05);border-radius:6px;padding:3px 8px;font-size:11px;margin:2px;display:inline-block">${i}</span>`).join('') : '';
+    return `
+    <div class="card" style="margin-bottom:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:32px">${meal.emoji}</span>
+          <div>
+            <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px">${icon} ${label}</div>
+            <div style="font-size:15px;font-weight:700">${rName(meal)}</div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:18px;font-weight:800;color:var(--p1)">${meal.cal} kcal</div>
+          <div style="font-size:10px;color:var(--text2)">~${meal.time||''}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;margin-bottom:${ing?'10px':'0'}">
+        <div style="text-align:center"><div style="font-size:13px;font-weight:700;color:var(--g1)">${meal.pro}g</div><div style="font-size:10px;color:var(--text2)">${t('dash_protein')}</div></div>
+        <div style="text-align:center"><div style="font-size:13px;font-weight:700;color:var(--y1)">${meal.carb}g</div><div style="font-size:10px;color:var(--text2)">${t('dash_carbs')}</div></div>
+        <div style="text-align:center"><div style="font-size:13px;font-weight:700;color:var(--a1)">${meal.fat}g</div><div style="font-size:10px;color:var(--text2)">${t('dash_fat')}</div></div>
+      </div>
+      ${ing ? `<div style="margin-bottom:8px"><div style="font-size:10px;font-weight:700;color:var(--text2);margin-bottom:6px;text-transform:uppercase">${t('rec_ingredients')}</div><div>${ing}</div></div>` : ''}
+      ${steps ? `<div><div style="font-size:10px;font-weight:700;color:var(--text2);margin-bottom:4px;text-transform:uppercase">${t('rec_cooking')}</div>${steps}</div>` : ''}
+    </div>`;
+  };
+
+  html += `<div class="card" style="background:linear-gradient(135deg,rgba(16,185,129,0.1),rgba(34,211,153,0.05));border-color:rgba(16,185,129,0.3);margin-bottom:12px">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="font-size:16px;font-weight:800">${t('plan_meal_plan')}</div>
+      <div style="text-align:right">
+        <div style="font-size:18px;font-weight:800;color:${totalCal<=goal?'var(--g1)':'var(--a1)'}">${totalCal} kcal</div>
+        <div style="font-size:10px;color:var(--text2)">${t('dash_target')}: ${goal} kcal</div>
+      </div>
+    </div>
+  </div>`;
+
+  html += mealHtml(bf, 'Pusryčiai', '🌅');
+  html += mealHtml(sn1, 'Užkandis', '🍎');
+  html += mealHtml(ln, 'Pietūs', '☀️');
+  html += mealHtml(sn2, 'Popietinis užkandis', '🥜');
+  html += mealHtml(dn, 'Vakarienė', '🌙');
+
+  html += `<div style="height:20px"></div>`;
+  document.getElementById('planContent').innerHTML = html;
+}
+
+// ═══ 2 SAVAIČIŲ PLANAS ══════════════════════════════════
+
+const DAYS_LT = ['Sekmadienis','Pirmadienis','Antradienis','Trečiadienis','Ketvirtadienis','Penktadienis','Šeštadienis'];
+const DAYS_EN = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const MONTHS_LT = ['sausio','vasario','kovo','balandžio','gegužės','birželio','liepos','rugpjūčio','rugsėjo','spalio','lapkričio','gruodžio'];
+const MONTHS_EN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+function dayName(idx) { return LANG==='en' ? DAYS_EN[idx] : DAYS_LT[idx]; }
+function monthName(idx) { return LANG==='en' ? MONTHS_EN[idx] : MONTHS_LT[idx]; }
+
+function getDayDate(offset) {
+  const d = new Date();
+  d.setDate(d.getDate() + offset);
+  return d;
+}
+
+function formatDate(d) {
+  return `${d.getDate()} ${MONTHS_LT[d.getMonth()]}`;
+}
+
+const SHOPPING_CATEGORIES = {
+  '🥩 Mėsa ir žuvis': ['vištienos','kalakutienos','lašišos','tonų','krevečių','žuvies','maltos mėsos','faršo','šonkauliukų'],
+  '🥛 Pieno produktai': ['jogurto','graikiško jogurto','pieno','varškės','sūrio','mocarelos','parmezano','grietinės','grietinėlės','kiaušinių','kiaušinis','sviestas'],
+  '🥦 Daržovės': ['brokolių','paprikos','paprika','pomidorų','pomidoras','agurkų','agurkas','špinatų','morkos','morka','svogūnas','svogūno','česnako','česnakas','cukinija','cukinijos','baklažano','kopūstas','burokėlių','salierų','žirnių','lęšių','poro','poras'],
+  '🍎 Vaisiai ir uogos': ['bananas','bananų','obuolys','obuolių','citrina','citrinos','uogų','avokadas','avokado','spanguolių'],
+  '🌾 Grūdai ir kruopos': ['avižų','avižinių','ryžių','ryžiai','makaronų','makaronai','miltų','duonos','duona','kviečių','granolų','krekerių'],
+  '🥫 Konservai ir kt.': ['pomidorų skardinėje','tonų skardinė','sojos padažas','alyvuogių aliejus','alyvuogių','kokosų aliejaus','medus','cukraus','vanilinas','kepimo milteliai','kakavos'],
+  '🫙 Kita': ['riešutų','graikinių riešutų','sezamo','humusas','tofu','proteino miltelių','šokolado','kokosų'],
+};
+
+function categorizeShopping(ingredients) {
+  const result = {};
+  Object.keys(SHOPPING_CATEGORIES).forEach(cat => result[cat] = []);
+  const uncategorized = [];
+
+  ingredients.forEach(ing => {
+    const ingLower = ing.toLowerCase();
+    let categorized = false;
+    for (const [cat, keywords] of Object.entries(SHOPPING_CATEGORIES)) {
+      if (keywords.some(kw => ingLower.includes(kw))) {
+        if (!result[cat].includes(ing)) result[cat].push(ing);
+        categorized = true; break;
+      }
+    }
+    if (!categorized && !uncategorized.includes(ing)) uncategorized.push(ing);
+  });
+  if (uncategorized.length) result['📦 Kiti produktai'] = uncategorized;
+  return result;
+}
+
+// Planai apibrėžiami prieš renderSavaitesPlanas
+const GYM_PLANS_2 = [
+  { label:'Pirmadienis', focus:'Krūtinė + Tricepsai 💪', exercises:[{id:'bench',sets:'4×8',rest:'120s'},{id:'ohp',sets:'3×10',rest:'90s'},{id:'dip',sets:'3×10',rest:'60s'},{id:'pushup',sets:'3×15',rest:'60s'},{id:'plank',sets:'3×45s',rest:'30s'}]},
+  { label:'Antradienis', focus:'Nugara + Bicepsai 🎯', exercises:[{id:'deadlift',sets:'4×5',rest:'180s'},{id:'pullup',sets:'4×6',rest:'120s'},{id:'row',sets:'3×10',rest:'90s'},{id:'curl',sets:'3×12',rest:'60s'},{id:'plank',sets:'3×45s',rest:'30s'}]},
+  { label:'Trečiadienis', focus:'Kojos + Sėdmenys 🦵', exercises:[{id:'squat',sets:'4×8',rest:'180s'},{id:'rdl',sets:'3×10',rest:'120s'},{id:'lunge',sets:'3×12',rest:'60s'},{id:'slunge',sets:'3×10',rest:'60s'},{id:'russian',sets:'3×20',rest:'45s'}]},
+  { label:'Ketvirtadienis', focus:'Pečiai + Rankos 🏆', exercises:[{id:'ohp',sets:'4×8',rest:'90s'},{id:'curl',sets:'3×12',rest:'60s'},{id:'dip',sets:'3×12',rest:'60s'},{id:'row',sets:'3×10',rest:'90s'},{id:'crunch',sets:'3×20',rest:'45s'}]},
+  { label:'Penktadienis', focus:'Visas kūnas 💥', exercises:[{id:'deadlift',sets:'3×5',rest:'180s'},{id:'bench',sets:'3×8',rest:'120s'},{id:'squat',sets:'3×10',rest:'120s'},{id:'pullup',sets:'3×6',rest:'90s'},{id:'burpee',sets:'3×10',rest:'60s'}]},
+  { label:'Šeštadienis', focus:'Aktyvus poilsis 🏃', exercises:[{id:'jj',sets:'4×60s',rest:'30s'},{id:'plank',sets:'4×60s',rest:'30s'},{id:'crunch',sets:'3×25',rest:'45s'},{id:'russian',sets:'3×20',rest:'45s'},{id:'lunge',sets:'3×15',rest:'60s'}]},
+  { label:'Sekmadienis', focus:'Poilsis 😌', exercises:[] }
+];
+const HOME_PLANS_2 = [
+  { label:'Pirmadienis', focus:'Viršutinė dalis 💪', exercises:[{id:'pushup',sets:'4×15',rest:'60s'},{id:'dip',sets:'3×12',rest:'60s'},{id:'plank',sets:'4×45s',rest:'30s'},{id:'crunch',sets:'3×20',rest:'45s'},{id:'russian',sets:'3×15',rest:'45s'}]},
+  { label:'Antradienis', focus:'Kojos 🦵', exercises:[{id:'squat',sets:'4×20',rest:'60s'},{id:'lunge',sets:'3×15',rest:'60s'},{id:'rdl',sets:'3×15',rest:'60s'},{id:'slunge',sets:'3×12',rest:'60s'},{id:'russian',sets:'3×20',rest:'45s'}]},
+  { label:'Trečiadienis', focus:'Kardio 🔥', exercises:[{id:'burpee',sets:'5×12',rest:'45s'},{id:'jj',sets:'4×60s',rest:'30s'},{id:'crunch',sets:'4×25',rest:'45s'},{id:'plank',sets:'4×60s',rest:'30s'},{id:'squat',sets:'3×20',rest:'45s'}]},
+  { label:'Ketvirtadienis', focus:'Pilvas + Core 🧘', exercises:[{id:'plank',sets:'5×60s',rest:'30s'},{id:'crunch',sets:'4×25',rest:'45s'},{id:'russian',sets:'4×20',rest:'45s'},{id:'lunge',sets:'3×15',rest:'60s'},{id:'pushup',sets:'3×15',rest:'60s'}]},
+  { label:'Penktadienis', focus:'Visas kūnas 💥', exercises:[{id:'squat',sets:'3×20',rest:'60s'},{id:'pushup',sets:'3×15',rest:'60s'},{id:'lunge',sets:'3×15',rest:'60s'},{id:'burpee',sets:'3×12',rest:'60s'},{id:'plank',sets:'3×45s',rest:'30s'}]},
+  { label:'Šeštadienis', focus:'Lengvas judėjimas 🌿', exercises:[{id:'jj',sets:'3×60s',rest:'30s'},{id:'plank',sets:'3×45s',rest:'30s'},{id:'crunch',sets:'3×20',rest:'45s'},{id:'squat',sets:'3×15',rest:'60s'},{id:'russian',sets:'3×15',rest:'45s'}]},
+  { label:'Sekmadienis', focus:'Poilsis 😌', exercises:[] }
+];
+const CARDIO_PLANS_2 = [
+  { label:'Pirmadienis', focus:'Intervalinis kardio 🔥', exercises:[{id:'burpee',sets:'5×15',rest:'30s'},{id:'jj',sets:'5×60s',rest:'20s'},{id:'squat',sets:'4×20',rest:'30s'},{id:'lunge',sets:'3×15',rest:'30s'},{id:'plank',sets:'3×60s',rest:'30s'}]},
+  { label:'Antradienis', focus:'Pilvas + Core 🧘', exercises:[{id:'crunch',sets:'5×25',rest:'30s'},{id:'russian',sets:'4×25',rest:'30s'},{id:'plank',sets:'5×60s',rest:'20s'},{id:'lunge',sets:'3×15',rest:'45s'},{id:'jj',sets:'3×45s',rest:'30s'}]},
+  { label:'Trečiadienis', focus:'Visas kūnas aktyviai 💥', exercises:[{id:'burpee',sets:'4×15',rest:'30s'},{id:'squat',sets:'4×20',rest:'30s'},{id:'pushup',sets:'4×15',rest:'30s'},{id:'jj',sets:'4×60s',rest:'20s'},{id:'plank',sets:'3×45s',rest:'30s'}]},
+  { label:'Ketvirtadienis', focus:'Apatinė kūno dalis 🦵', exercises:[{id:'squat',sets:'5×20',rest:'45s'},{id:'lunge',sets:'4×15',rest:'45s'},{id:'slunge',sets:'3×15',rest:'45s'},{id:'rdl',sets:'3×15',rest:'45s'},{id:'crunch',sets:'3×25',rest:'30s'}]},
+  { label:'Penktadienis', focus:'Visas kūnas tempas 🏃', exercises:[{id:'jj',sets:'5×60s',rest:'20s'},{id:'burpee',sets:'4×12',rest:'30s'},{id:'pushup',sets:'3×15',rest:'30s'},{id:'squat',sets:'3×20',rest:'30s'},{id:'plank',sets:'3×60s',rest:'20s'}]},
+  { label:'Šeštadienis', focus:'Aktyvus pasivaikščiojimas 🌳', exercises:[{id:'jj',sets:'3×45s',rest:'30s'},{id:'plank',sets:'3×45s',rest:'30s'},{id:'crunch',sets:'3×20',rest:'30s'},{id:'lunge',sets:'3×12',rest:'30s'},{id:'russian',sets:'3×15',rest:'30s'}]},
+  { label:'Sekmadienis', focus:'Poilsis 😌', exercises:[] }
+];
+function getPlanForProfile2(p) {
+  if (!p) return WEEK_PLANS;
+  if (p.location === 'sale') return p.goal === 'svorio_metimas' ? CARDIO_PLANS_2 : GYM_PLANS_2;
+  return p.goal === 'svorio_metimas' ? CARDIO_PLANS_2 : HOME_PLANS_2;
+}
+
+function renderSavaitesPlanas() {
+  const p = ST.profile;
+  const plans = getPlanForProfile2(p);
+  const exMap = {};
+  EXERCISES.forEach(e => exMap[e.id] = e);
+  const loc = p?.location || 'namai';
+  const allIngredients = [];
+
+  let html = '';
+
+  if (!p) {
+    html = `<div class="card" style="text-align:center;padding:40px">
+      <div style="font-size:48px">🎯</div>
+      <div style="font-size:18px;font-weight:800;margin-top:12px">Pirma sukurk asmeninį planą</div>
+      <div style="color:var(--text2);margin-top:8px">Eik į "Dienos Planas" ir užpildyk savo duomenis</div>
+      <button onclick="showOnboarding()" class="btn" style="margin-top:16px">Sukurti planą</button>
+    </div>`;
+    document.getElementById('savaitesplanasContent').innerHTML = html;
+    return;
+  }
+
+  // Collect all meals for 14 days
+  const allMeals14 = [];
+  for (let i = 0; i < 14; i++) {
+    const d = getDayDate(i);
+    const dayNum = d.getDate();
+    const ms = getMealSuggestions(p);
+    const bfList = ms.bfList || RECIPES.breakfast;
+    const lnList = ms.lnList || RECIPES.lunch;
+    const dnList = ms.dnList || RECIPES.dinner;
+    const bf = bfList[dayNum % bfList.length];
+    const ln = lnList[dayNum % lnList.length];
+    const dn = dnList[dayNum % dnList.length];
+    const sn1 = RECIPES.snack[dayNum % RECIPES.snack.length];
+    allMeals14.push({ bf, ln, dn, sn1 });
+    [bf, ln, dn, sn1].forEach(meal => {
+      if (meal?.ing) meal.ing.forEach(i => { if (!allIngredients.includes(i)) allIngredients.push(i); });
+    });
+  }
+
+  // SHOPPING LIST BUTTON
+  html += `<div class="card" style="background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(52,211,153,0.05));border-color:rgba(16,185,129,0.3);margin-bottom:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:16px;font-weight:800">🗓️ 2 Savaičių planas</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:2px">${loc === 'sale' ? '🏋️ Sporto salė' : '🏠 Namai'} · Treniruotės + Mityba</div>
+      </div>
+      <button onclick="toggleShoppingList()" class="btn btn-green" style="font-size:12px;padding:8px 14px">🛒 Apsipirkimo sąrašas</button>
+    </div>
+  </div>`;
+
+  // SHOPPING LIST (hidden by default)
+  const shopCats = categorizeShopping(allIngredients);
+  let shopHtml = `<div id="shoppingListDiv" style="display:none" class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-size:16px;font-weight:800">🛒 Apsipirkimo sąrašas — 2 savaitės</div>
+      <button onclick="printShoppingList()" style="background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.3);border-radius:8px;color:#A78BFA;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer">🖨️ Spausdinti</button>
+    </div>`;
+  Object.entries(shopCats).forEach(([cat, items]) => {
+    if (!items.length) return;
+    shopHtml += `<div style="margin-bottom:14px">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">${cat}</div>
+      <div>${items.map(i => `
+        <label style="display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.04)">
+          <input type="checkbox" style="width:16px;height:16px;accent-color:var(--p1)">
+          <span style="font-size:13px">${i}</span>
+        </label>`).join('')}
+      </div>
+    </div>`;
+  });
+  shopHtml += `</div>`;
+  html += shopHtml;
+
+  // 14 DAYS
+  for (let i = 0; i < 14; i++) {
+    const d = getDayDate(i);
+    const dayIdx = d.getDay();
+    const planIdx = dayIdx === 0 ? 6 : dayIdx - 1;
+    const plan = plans[planIdx];
+    const { bf, ln, dn, sn1 } = allMeals14[i];
+    const isToday = i === 0;
+    const isRest = plan.exercises.length === 0;
+    const weekNum = i < 7 ? 1 : 2;
+    const isWeekStart = i === 0 || i === 7;
+
+    if (isWeekStart) {
+      html += `<div style="font-size:13px;font-weight:800;color:var(--p1);text-transform:uppercase;letter-spacing:2px;margin:${i===0?'0':'16px'} 0 8px">${weekNum} savaitė</div>`;
+    }
+
+    html += `
+    <div class="card" style="margin-bottom:10px;${isToday?'border-color:rgba(139,92,246,0.5);background:rgba(139,92,246,0.05)':''}">
+      <div onclick="toggleDay('day${i}')" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          ${isToday ? '<span style="background:rgba(139,92,246,0.3);color:#A78BFA;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;margin-right:8px">ŠIANDIEN</span>' : ''}
+          <span style="font-size:15px;font-weight:800">${dayName(dayIdx)}</span>
+          <span style="font-size:12px;color:var(--text2);margin-left:8px">${formatDate(d)}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:11px;color:var(--text2)">${isRest ? (LANG==='en'?'😌 Rest':'😌 Poilsis') : trFocus(plan.focus)}</span>
+          <span id="arrow${i}" style="color:var(--text2);transition:transform 0.2s">${isToday ? '▲' : '▼'}</span>
+        </div>
+      </div>
+
+      <div id="day${i}" style="display:${isToday?'block':'none'};margin-top:14px">
+        ${isRest ? `<div style="text-align:center;padding:16px;color:var(--text2)">😌 ${t('plan_rest')} — ${LANG==='en'?'body recovers and grows':'kūnas atsistatina ir auga'}</div>` : `
+        <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">💪 Treniruotė — ${loc === 'sale' ? '🏋️ Sporto salė' : '🏠 Namai'}</div>
+        ${plan.exercises.map(ex => {
+          const e = exMap[ex.id]; if (!e) return '';
+          const ytQ = loc === 'sale' ? (e.ytGym || e.yt) : (e.ytHome || e.yt);
+          const ytUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(ytQ)}`;
+          return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
+            <span style="font-size:20px">${e.emoji}</span>
+            <div style="flex:1"><div style="font-size:13px;font-weight:600">${LANG==='en'&&e.englishName?e.englishName:e.name}</div>
+            <div style="font-size:11px;color:var(--text2)">${ex.sets} · ${ex.rest}</div></div>
+            <a href="${ytUrl}" target="_blank" rel="noopener"
+               style="background:rgba(255,0,0,0.15);border:1px solid rgba(255,0,0,0.3);border-radius:6px;padding:4px 8px;color:#FF4444;font-size:10px;font-weight:700;text-decoration:none;white-space:nowrap;display:inline-block">▶ Video</a>
+          </div>`;
+        }).join('')}`}
+
+        <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin:12px 0 8px">🍽️ ${LANG==='en'?'Nutrition':'Mityba'}</div>
+        ${[
+          {meal:bf, label:'Pusryčiai 🌅'},
+          {meal:sn1, label:'Užkandis 🍎'},
+          {meal:ln, label:'Pietūs ☀️'},
+          {meal:dn, label:'Vakarienė 🌙'}
+        ].map(({meal, label}) => meal ? `
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
+          <span style="font-size:20px">${meal.emoji}</span>
+          <div style="flex:1"><div style="font-size:12px;font-weight:600">${label}</div>
+          <div style="font-size:12px;color:var(--text2)">${meal.name}</div></div>
+          <span style="font-size:12px;font-weight:700;color:var(--p1)">${meal.cal} kcal</span>
+        </div>` : '').join('')}
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('savaitesplanasContent').innerHTML = html;
+}
+
+function toggleDay(id) {
+  const el = document.getElementById(id);
+  const idx = id.replace('day','');
+  const arrow = document.getElementById('arrow'+idx);
+  const isOpen = el.style.display !== 'none';
+  el.style.display = isOpen ? 'none' : 'block';
+  if (arrow) arrow.textContent = isOpen ? '▼' : '▲';
+}
+
+function toggleShoppingList() {
+  const el = document.getElementById('shoppingListDiv');
+  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+function printShoppingList() {
+  const content = document.getElementById('shoppingListDiv').innerHTML;
+  const w = window.open('','_blank');
+  w.document.write(`<html><head><title>Apsipirkimo sąrašas — FitLT</title>
+  <style>body{font-family:sans-serif;padding:20px} label{display:flex;gap:8px;padding:4px 0;border-bottom:1px solid #eee} h3{color:#8B5CF6}</style>
+  </head><body><h2>🛒 Apsipirkimo sąrašas — 2 savaitės</h2>${content}</body></html>`);
+  w.print();
+}
+
+// ═══ RECEPTAI ═══════════════════════════════════════════
+
+const ALL_RECIPES = {
+  'Pusryčiai 🌅': [
+    ...RECIPES.breakfast,
+    {name:'Skramblinti kiaušiniai su lašiša', cal:310, pro:24, carb:4, fat:21, time:'8 min', emoji:'🥚',
+     ing:['3 kiaušiniai','50g rūkytos lašišos','Grietinėlė','Krapai','Sviestas'],
+     steps:['Ištirpinkite sviestą keptuvėje','Supilkite kiaušinius su grietinėle','Maišykite kol sukietėja','Uždėkite lašišą ir krapus']},
+    {name:'Šokolado proteino kokteilius', cal:340, pro:28, carb:35, fat:8, time:'3 min', emoji:'🍫',
+     ing:['1 bananas','1 šaukštas proteino miltelių','200ml pieno','1 šaukštas kakavos','Ledai'],
+     steps:['Visus ingredientus sudėkite į blenderį','Frapuokite 30 sek','Pilkite į stiklinę']},
+    {name:'Kviečių košė su obuoliu', cal:300, pro:8, carb:55, fat:6, time:'10 min', emoji:'🍏',
+     ing:['80g kviečių košės','200ml pieno','1 obuolys','Cinamonas','Medus'],
+     steps:['Virkite košę piene','Obuolį sutarkuokite','Sumaišykite su cinamonu ir medumi']},
+  ],
+  'Pietūs ☀️': [
+    ...RECIPES.lunch,
+    {name:'Cezario salotos su vištiena', cal:420, pro:35, carb:20, fat:22, time:'15 min', emoji:'🥗',
+     ing:['200g vištienos krūtinėlės','Romaine salotos','Parmezanas','Krekeriai','Cezario padažas'],
+     steps:['Kepkite vištieną','Sumaišykite salotų ingredientus','Uždėkite vištieną ir padažą']},
+    {name:'Žirnių sriuba', cal:290, pro:16, carb:42, fat:6, time:'40 min', emoji:'🟢',
+     ing:['300g žirnių','Svogūnas','Morka','Petražolės','Rūkyti šonkauliukai'],
+     steps:['Mirkyti žirnius per naktį','Virti sultinyje 30 min','Sutrinti dalį sriubos']},
+    {name:'Kepti ryžiai su kiaušiniu', cal:380, pro:15, carb:60, fat:10, time:'15 min', emoji:'🍳',
+     ing:['200g virtų ryžių','2 kiaušiniai','Morkos','Žalieji žirneliai','Sojos padažas'],
+     steps:['Pakepinkite daržoves','Pridėkite ryžius','Sulaužykite kiaušinius ir maišykite']},
+    {name:'Grietinės sriuba', cal:250, pro:8, carb:22, fat:14, time:'30 min', emoji:'🥣',
+     ing:['Bulvės','Svogūnas','Morkos','Grietinė','Krapai'],
+     steps:['Virkite daržoves','Grietinę įmaišykite pabaigoje','Puoškite krapais']},
+  ],
+  'Vakarienė 🌙': [
+    ...RECIPES.dinner,
+    {name:'Maltos mėsos pyragas', cal:440, pro:30, carb:35, fat:18, time:'60 min', emoji:'🥧',
+     ing:['400g maltos mėsos','Bulvės','Morkos','Svogūnas','Kiaušinis','Pienas'],
+     steps:['Išvirkite bulves, sutrinkite','Pakepinkite mėsą su daržovėmis','Klokite sluoksnius ir kepkite 180°C 35 min']},
+    {name:'Krevetės su česnaku ir makaronais', cal:420, pro:32, carb:48, fat:10, time:'20 min', emoji:'🍝',
+     ing:['200g krevečių','200g makaronų','4 česnako skiltelės','Alyvuogių aliejus','Petražolės'],
+     steps:['Virkite makaronus','Kepkite krevetines su česnakais','Sumaišykite su makaronais ir petražolėmis']},
+    {name:'Orkaitėje keptos daržovės', cal:180, pro:5, carb:28, fat:7, time:'35 min', emoji:'🫑',
+     ing:['Paprika','Cukinija','Baklažanas','Pomidoras','Česnakai','Rozmarinas'],
+     steps:['Supjaustykite daržoves','Pagardinkite aliejumi ir prieskoniais','Kepkite 200°C 25 min']},
+  ],
+  'Užkandžiai 🍎': [
+    ...RECIPES.snack,
+    {name:'Naminiai granolų batonėliai', cal:180, pro:5, carb:26, fat:7, time:'30 min', emoji:'🍫',
+     ing:['200g avižų','Medus','Riešutai','Džiovinti vaisiai','Kokosų aliejus'],
+     steps:['Sumaišykite visus ingredientus','Paskleiskite ant skardos','Kepkite 160°C 20 min','Supjaustykite']},
+    {name:'Humuso dippas su daržovėmis', cal:160, pro:7, carb:18, fat:7, time:'5 min', emoji:'🥕',
+     ing:['Humusas','Morkos','Agurkas','Paprika','Salierų kotai'],
+     steps:['Supjaustykite daržoves lazdelėmis','Patiekite su humusu']},
+    {name:'Graikiniai riešutai su džiovintomis spanguolėmis', cal:190, pro:4, carb:15, fat:13, time:'1 min', emoji:'🫐'},
+    {name:'Proteininis ledų kokteilius', cal:220, pro:22, carb:24, fat:4, time:'3 min', emoji:'🍦',
+     ing:['Šaldytas bananas','Proteino milteliai','Pienas'],
+     steps:['Sušaldykite bananus','Frapuokite su pienu ir proteinu']},
+  ],
+  'Desertai 🍰': [
+    {name:'Šokoladinis avokado pudingas', cal:280, pro:4, carb:32, fat:16, time:'10 min', emoji:'🍫',
+     ing:['2 avokadai','3 šaukštai kakavos','4 šaukštai medaus','Vanilinis ekstraktas','Pienas'],
+     steps:['Avokadus sutrinkite','Pridėkite kakavą, medų ir vaniliną','Frapuokite iki vientisos masės','Šaldykite 30 min']},
+    {name:'Naminiai blynai su uogomis', cal:320, pro:10, carb:58, fat:7, time:'25 min', emoji:'🫐',
+     ing:['200g miltų','2 kiaušiniai','300ml pieno','Cukrus','Uogos','Grietinė'],
+     steps:['Sumaišykite tešlą','Kepkite plonytėlius blynus','Patiekite su uogomis ir grietine']},
+    {name:'Varškės pyragas', cal:350, pro:18, carb:45, fat:10, time:'50 min', emoji:'🍰',
+     ing:['500g varškės','3 kiaušiniai','150g cukraus','100g miltų','Vanilinas','Citrinos žievelė'],
+     steps:['Sumaišykite varškę su kiaušiniais','Pridėkite cukrų ir miltus','Kepkite 170°C 40 min']},
+    {name:'Jogurto ir uogų popsai', cal:120, pro:6, carb:18, fat:2, time:'4 val šaldymo', emoji:'🍡',
+     ing:['300g graikiško jogurto','Medus','Šaldytos uogos','Kokosų drožlės'],
+     steps:['Sumaišykite jogurtą su medumi','Sudėkite uogas','Pilkite į formas ir šaldykite 4 val']},
+    {name:'Bananų ledai (2 ingr.)', cal:105, pro:1, carb:27, fat:0, time:'2 val šaldymo', emoji:'🍌',
+     ing:['2 šaldyti bananai','Žiupsnelis druskos'],
+     steps:['Sušaldykite bananų gabalėlius','Frapuokite iki ledo konsistencijos']},
+    {name:'Avižinis obuolių pyragas', cal:290, pro:6, carb:52, fat:8, time:'45 min', emoji:'🍏',
+     ing:['200g avižų','3 obuoliai','100g cukraus','2 kiaušiniai','Cinamonas','Kepimo milteliai'],
+     steps:['Sumaišykite sausus ir drėgnus ingredientus','Obuolius sutarkuokite','Kepkite 180°C 35 min']},
+    {name:'Šokolado trufiai', cal:160, pro:3, carb:18, fat:9, time:'30 min+šaldymas', emoji:'🍫',
+     ing:['200g juodojo šokolado','100ml grietinėlės','Kakava apvolymui'],
+     steps:['Ištirpinkite šokoladą su grietinėle','Šaldykite 2 val','Formuokite rutuliukus','Apvolykite kakavoje']},
+    {name:'Naminiai sausainiai', cal:120, pro:2, carb:18, fat:5, time:'25 min', emoji:'🍪',
+     ing:['200g miltų','100g sviesto','80g cukraus','1 kiaušinis','Vanilinas'],
+     steps:['Sutrinkite sviestą su cukrumi','Pridėkite kiaušinį ir miltus','Formuokite sausainius','Kepkite 180°C 12 min']},
+  ],
+  'Sriubos 🍲': [
+    {name:'Pomidorų grietinėlės sriuba', cal:220, pro:5, carb:22, fat:12, time:'25 min', emoji:'🍅',
+     ing:['1kg pomidorų','Svogūnas','Česnako skiltelės','Grietinėlė','Bazilikas'],
+     steps:['Troškinkite pomidorus su svogūnu','Sutrinkite','Pridėkite grietinėlę','Patiekite su baziliku']},
+    {name:'Grybų sriuba', cal:180, pro:8, carb:20, fat:7, time:'35 min', emoji:'🍄',
+     ing:['300g grybų','Svogūnas','Morka','Grietinė','Krapai','Miltai'],
+     steps:['Pakepinkite grybus su svogūnu','Pridėkite sultinį','Sutirštinkite miltais','Įmaišykite grietinę']},
+    {name:'Šaltibarščiai', cal:150, pro:8, carb:15, fat:5, time:'15 min', emoji:'🟣',
+     ing:['Burokėliai (virta/konservuota)','Kefyras','Kiaušinis','Agurkas','Krapai'],
+     steps:['Sutarkuokite burokėlius','Supilkite kefyrą','Pridėkite daržoves ir kiaušinį','Šaldykite']},
+    {name:'Žuvies sriuba', cal:240, pro:25, carb:18, fat:7, time:'30 min', emoji:'🐟',
+     ing:['300g lašišos','Bulvės','Poras','Grietinėlė','Krapai'],
+     steps:['Virkite bulves sultinyje','Pridėkite žuvį','Virkite dar 10 min','Įmaišykite grietinėlę']},
+  ],
+  'Sveikos picos ir sumuštiniai 🥪': [
+    {name:'Avokado toastas su kiaušiniu', cal:320, pro:16, carb:28, fat:16, time:'10 min', emoji:'🥑',
+     ing:['2 riekelės duonos','1 avokadas','2 kiaušiniai','Druska','Citrina'],
+     steps:['Paskrudinikite duoną','Avokadą ištrinkite','Kepkite kiaušinius','Sudėkite sluoksnius']},
+    {name:'Kalakutienos Klubinis', cal:380, pro:30, carb:35, fat:12, time:'10 min', emoji:'🥪',
+     ing:['3 riekelės duonos','150g kalakutienos','Salotos','Pomidoras','Majonezas','Sūris'],
+     steps:['Paskrudinikite duoną','Klokite sluoksnius su kalakutiena ir daržovėmis']},
+    {name:'Pica ant cukinijos', cal:200, pro:14, carb:15, fat:9, time:'25 min', emoji:'🫑',
+     ing:['2 cukinijos (perpjautos)','Pomidorų padažas','Mocarela','Bazilikas'],
+     steps:['Cukinijas iškaskite','Tepkite padažu','Uždėkite sūrį','Kepkite 190°C 15 min']},
+    {name:'Varškės sūrelio sumuštinis', cal:260, pro:18, carb:28, fat:8, time:'5 min', emoji:'🧀',
+     ing:['2 riekelės juodos duonos','Varškės sūrelis','Agurkas','Krapai','Česnakas'],
+     steps:['Sumaišykite varškės sūrelį su česnaku','Aptepkite duoną','Uždėkite agurką ir krapus']},
+  ],
+};
+
+let activeRecipeCategory = 'Pusryčiai 🌅';
+
+// Category names LT → EN mapping
+const CAT_EN = {
+  'Pusryčiai 🌅':'Breakfast 🌅','Pietūs ☀️':'Lunch ☀️','Vakarienė 🌙':'Dinner 🌙',
+  'Užkandžiai 🍎':'Snacks 🍎','Desertai 🍰':'Desserts 🍰','Sriubos 🍲':'Soups 🍲',
+  'Sveikos picos ir sumuštiniai 🥪':'Healthy Pizzas & Sandwiches 🥪'
+};
+function catLabel(c) { return LANG==='en' && CAT_EN[c] ? CAT_EN[c] : c; }
+
+function renderReceptai() {
+  const cats = Object.keys(ALL_RECIPES);
+  let html = `
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+    ${cats.map(c=>`<button onclick="filterRecipes('${c}')" id="rcBtn_${c.replace(/\s/g,'_').replace(/[^\w]/g,'')}"
+      class="ex-filter ${c===activeRecipeCategory?'active':''}" style="font-size:12px">${catLabel(c)}</button>`).join('')}
+  </div>
+  <div id="recipeGrid"></div>`;
+  document.getElementById('receptaiContent').innerHTML = html;
+  showRecipeCategory(activeRecipeCategory);
+}
+
+function filterRecipes(cat) {
+  activeRecipeCategory = cat;
+  document.querySelectorAll('[id^="rcBtn_"]').forEach(b=>b.classList.remove('active'));
+  const safeId = cat.replace(/\s/g,'_').replace(/[^\w]/g,'');
+  const btn = document.getElementById('rcBtn_'+safeId);
+  if(btn) btn.classList.add('active');
+  showRecipeCategory(cat);
+}
+
+function showRecipeCategory(cat) {
+  const recipes = ALL_RECIPES[cat] || [];
+  const html = recipes.map(r => {
+    const _ing = rIng(r); const _steps = rSteps(r);
+    return `
+    <div class="card" style="margin-bottom:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:36px">${r.emoji}</span>
+          <div>
+            <div style="font-size:15px;font-weight:700">${rName(r)}</div>
+            <div style="font-size:11px;color:var(--text2)">${r.time||''}</div>
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:18px;font-weight:800;color:var(--p1)">${r.cal} kcal</div>
+          <div style="font-size:10px;color:var(--text2)">${r.pro}${LANG==='en'?'p':'b'} / ${r.carb}${LANG==='en'?'c':'a'} / ${r.fat}${LANG==='en'?'f':'r'}</div>
+        </div>
+      </div>
+      ${_ing.length ? `<div style="margin-bottom:10px">
+        <div style="font-size:10px;font-weight:700;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">${t('rec_ingredients')}</div>
+        <div>${_ing.map(i=>`<span style="background:rgba(255,255,255,0.05);border-radius:6px;padding:3px 8px;font-size:11px;margin:2px;display:inline-block">${i}</span>`).join('')}</div>
+      </div>` : ''}
+      ${_steps.length ? `<div>
+        <div style="font-size:10px;font-weight:700;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">${t('rec_cooking')}</div>
+        ${_steps.map((s,i)=>`<div style="padding:4px 0;font-size:12px;color:var(--text2)"><span style="color:var(--p1);font-weight:700">${i+1}.</span> ${s}</div>`).join('')}
+      </div>` : ''}
+    </div>`;
+  }).join('');
+  document.getElementById('recipeGrid').innerHTML = html || `<div style="text-align:center;color:var(--text2);padding:40px">${LANG==='en'?'No recipes':'Nėra receptų'}</div>`;
+}
+
+// ═══ INIT ═══════════════════════════════════════════════
+renderDashboard();
+renderWorkouts();
+renderFoods();
+renderExercises();
+renderProgress();
+renderPlan();
+renderSavaitesPlanas();
+renderReceptai();
+applyLang();
+
+// ═══ SERVICE WORKER + PUSH NOTIFICATIONS ════════════════
+let swReg = null;
+if('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').then(reg => {
+    swReg = reg;
+    // Ask for notifications after 30s
+    setTimeout(askNotifications, 30000);
+  }).catch(()=>{});
+  // Kai naują versiją perima naujas service worker — vieną kartą perkrauname,
+  // kad vartotojas iš karto gautų šviežią kodą (be rankinio cache valymo).
+  let _reloaded = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (_reloaded) return;
+    _reloaded = true;
+    location.reload();
+  });
+}
+
+async function askNotifications() {
+  if(Notification.permission === 'default') {
+    const perm = await Notification.requestPermission();
+    if(perm === 'granted') {
+      toast('🔔 Priminimai įjungti!');
+      scheduleReminders();
+    }
+  } else if(Notification.permission === 'granted') {
+    scheduleReminders();
+  }
+}
+
+function scheduleReminders() {
+  // Local reminder via setTimeout (works without push server)
+  const now = new Date();
+  const reminder = new Date();
+  reminder.setHours(18, 0, 0, 0); // 18:00 every day
+  if(reminder <= now) reminder.setDate(reminder.getDate() + 1);
+  const ms = reminder - now;
+  setTimeout(() => {
+    if(Notification.permission === 'granted') {
+      new Notification('FitLT', {
+        body: 'Laikas treniruotis! Nepamirškite dienos tikslo 💪',
+        icon: 'icon-192.png'
+      });
+    }
+    setInterval(() => {
+      if(Notification.permission === 'granted') {
+        new Notification('FitLT', { body: 'Dienos treniruotė laukia! 🔥', icon: 'icon-192.png' });
+      }
+    }, 86400000); // every 24h
+  }, ms);
+}
+
+// ═══ DUOMENŲ KOPIJA (eksportas / importas) ══════════════
+async function exportData() {
+  const dump = {
+    app: 'FitLT',
+    schema: 1,
+    exported: new Date().toISOString(),
+    fitlt_v2: ST,
+    fitlt_lang: LANG
+  };
+  const json = JSON.stringify(dump, null, 2);
+  const filename = 'fitlt-kopija-' + new Date().toISOString().slice(0, 10) + '.json';
+  const ok = LANG === 'en' ? '\ud83d\udcbe Backup downloaded' : '\ud83d\udcbe Kopija atsiųsta';
+
+  // claude.ai artifact aplinkoje atsisiuntimus tvarko platforma — paprasta
+  // nuoroda tenai neveikia. Kitur (savas serveris, failas) einam paprastu keliu.
+  let dl = null;
+  try {
+    if (window.claude && typeof window.claude.use === 'function') {
+      dl = await window.claude.use('downloads');
+    }
+  } catch (e) { dl = null; }
+
+  if (dl) {
+    try {
+      await dl.save({ filename, data: json });
+      toast(ok);
+    } catch (e) {
+      if (e && e.code === 'declined') return;
+      alert('\u274c Nepavyko išsaugoti kopijos: ' + ((e && e.message) || e));
+    }
+    return;
+  }
+
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast(ok);
+}
+
+function importData(input) {
+  const file = input.files && input.files[0];
+  input.value = '';
+  if (!file) return;
+  const r = new FileReader();
+  r.onerror = () => alert('\u274c Nepavyko perskaityti failo.');
+  r.onload = () => {
+    try {
+      const d = JSON.parse(r.result);
+      const data = (d && typeof d === 'object' && d.fitlt_v2) ? d.fitlt_v2 : d;
+      if (!data || typeof data !== 'object' || !('goal' in data)) {
+        throw new Error('tai ne FitLT kopijos failas');
+      }
+      if (!confirm('Įkelti kopiją? Dabartiniai šio įrenginio duomenys bus perrašyti.')) return;
+      LS.set('fitlt_v2', JSON.stringify(validateST(data)));
+      const lang = d && d.fitlt_lang;
+      if (lang === 'lt' || lang === 'en') LS.set('fitlt_lang', lang);
+      location.reload();
+    } catch (e) {
+      alert('\u274c Nepavyko įkelti: ' + e.message);
+    }
+  };
+  r.readAsText(file);
+}
+
+// ═══ VIRAL SHARING ════════════════════════════════════════
+function shareApp() {
+  const url = window.location.href;
+  const text = '💪 Naudoju FitLT — nemokamą lietuvišką fitness programą! Išbandyk: ';
+  if(navigator.share) {
+    navigator.share({ title: 'FitLT', text, url }).catch(()=>{});
+  } else {
+    navigator.clipboard.writeText(text + url).then(() => toast('🔗 Nuoroda nukopijuota!'));
+  }
+}
+
+// Add share button to nav after 60s (encourage sharing)
+setTimeout(() => {
+  const nav = document.querySelector('.nav-right');
+  if(nav && !document.getElementById('shareBtn')) {
+    const btn = document.createElement('button');
+    btn.id = 'shareBtn';
+    btn.onclick = shareApp;
+    btn.style.cssText = 'background:none;border:1px solid rgba(255,255,255,0.15);border-radius:99px;color:#94A3B8;padding:6px 12px;font-size:12px;cursor:pointer;font-weight:600';
+    btn.textContent = LANG==='en' ? '🔗 Share' : '🔗 Dalintis';
+    nav.insertBefore(btn, nav.firstChild);
+  }
+}, 60000);
+
+// ═══ ONBOARDING & PROFILIS ══════════════════════════════
+
+function calcTDEE(p) {
+  // Mifflin-St Jeor BMR
+  let bmr = 10 * p.weight + 6.25 * p.height - 5 * p.age;
+  bmr += p.gender === 'vyras' ? 5 : -161;
+  const mult = [1.2, 1.375, 1.55, 1.725, 1.9][p.activity] || 1.55;
+  const tdee = Math.round(bmr * mult);
+  const goalAdj = {svorio_metimas: -500, raumenu_augimas: 300, bendra_forma: 0, palaikymas: 0};
+  return tdee + (goalAdj[p.goal] || 0);
+}
+
+function showOnboarding() {
+  const h2 = document.getElementById('ob_h2');
+  const p = document.getElementById('ob_p');
+  if (h2) h2.textContent = t('ob_title');
+  if (p) p.textContent = t('ob_sub');
+  document.getElementById('onboardModal').style.display = 'flex';
+  const cancelBtn = document.getElementById('ob_cancel_btn');
+  if (cancelBtn) cancelBtn.style.display = ST.profile ? 'block' : 'none';
+}
+
+function closeOnboarding() {
+  document.getElementById('onboardModal').style.display = 'none';
+}
+
+function saveProfile() {
+  const g = document.getElementById('ob_gender').value;
+  const age = parseInt(document.getElementById('ob_age').value);
+  const h = parseInt(document.getElementById('ob_height').value);
+  const w = parseFloat(document.getElementById('ob_weight').value);
+  const goal = document.getElementById('ob_goal').value;
+  const act = parseInt(document.getElementById('ob_activity').value);
+  const loc = document.getElementById('ob_location').value;
+
+  if (!g || !age || !h || !w || !goal || !loc) { toast('⚠️ Užpildyk visus laukus!'); return; }
+  if (age < 10 || age > 100) { toast('⚠️ Neteisingas amžius'); return; }
+  if (h < 100 || h > 250) { toast('⚠️ Neteisingas ūgis'); return; }
+  if (w < 30 || w > 300) { toast('⚠️ Neteisingas svoris'); return; }
+
+  ST.profile = { gender: g, age, height: h, weight: w, goal, activity: act, location: loc };
+  ST.goal = calcTDEE(ST.profile);
+  save();
+  closeOnboarding();
+  renderDashboard();
+  renderPlan();
+  const goalNames = {svorio_metimas:'numesti svorio', raumenu_augimas:'auginti raumenis', bendra_forma:'bendrą formą', palaikymas:'palaikyti svorį'};
+  toast(`✅ Planas sukurtas! Tikslas: ${ST.goal} kcal/dieną`);
+}
+
+function openProfileEdit() {
+  const p = ST.profile;
+  if (p) {
+    document.getElementById('ob_gender').value = p.gender;
+    document.getElementById('ob_age').value = p.age;
+    document.getElementById('ob_height').value = p.height;
+    document.getElementById('ob_weight').value = p.weight;
+    document.getElementById('ob_goal').value = p.goal;
+    document.getElementById('ob_activity').value = p.activity;
+    document.getElementById('ob_location').value = p.location;
+  }
+  showOnboarding();
+}
+
+// ═══ PERSONALIZUOTAS PLANAS ════════════════════════════
+
+const GYM_PLANS = [
+  { label:'Pirmadienis', focus:'Krūtinė + Tricepsai 💪', exercises:[
+    {id:'bench',sets:'4×8',rest:'120s'},{id:'ohp',sets:'3×10',rest:'90s'},
+    {id:'dip',sets:'3×10',rest:'60s'},{id:'pushup',sets:'3×15',rest:'60s'},{id:'plank',sets:'3×45s',rest:'30s'}
+  ]},
+  { label:'Antradienis', focus:'Nugara + Bicepsai 🎯', exercises:[
+    {id:'deadlift',sets:'4×5',rest:'180s'},{id:'pullup',sets:'4×6',rest:'120s'},
+    {id:'row',sets:'3×10',rest:'90s'},{id:'curl',sets:'3×12',rest:'60s'},{id:'plank',sets:'3×45s',rest:'30s'}
+  ]},
+  { label:'Trečiadienis', focus:'Kojos + Sėdmenys 🦵', exercises:[
+    {id:'squat',sets:'4×8',rest:'180s'},{id:'rdl',sets:'3×10',rest:'120s'},
+    {id:'lunge',sets:'3×12',rest:'60s'},{id:'slunge',sets:'3×10',rest:'60s'},{id:'russian',sets:'3×20',rest:'45s'}
+  ]},
+  { label:'Ketvirtadienis', focus:'Pečiai + Rankos 🏆', exercises:[
+    {id:'ohp',sets:'4×8',rest:'90s'},{id:'curl',sets:'3×12',rest:'60s'},
+    {id:'dip',sets:'3×12',rest:'60s'},{id:'row',sets:'3×10',rest:'90s'},{id:'crunch',sets:'3×20',rest:'45s'}
+  ]},
+  { label:'Penktadienis', focus:'Visas kūnas 💥', exercises:[
+    {id:'deadlift',sets:'3×5',rest:'180s'},{id:'bench',sets:'3×8',rest:'120s'},
+    {id:'squat',sets:'3×10',rest:'120s'},{id:'pullup',sets:'3×6',rest:'90s'},{id:'burpee',sets:'3×10',rest:'60s'}
+  ]},
+  { label:'Šeštadienis', focus:'Aktyvus poilsis 🏃', exercises:[
+    {id:'jj',sets:'4×60s',rest:'30s'},{id:'plank',sets:'4×60s',rest:'30s'},
+    {id:'crunch',sets:'3×25',rest:'45s'},{id:'russian',sets:'3×20',rest:'45s'},{id:'lunge',sets:'3×15',rest:'60s'}
+  ]},
+  { label:'Sekmadienis', focus:'Poilsis 😌', exercises:[] }
+];
+
+const HOME_PLANS = [
+  { label:'Pirmadienis', focus:'Viršutinė dalis 💪', exercises:[
+    {id:'pushup',sets:'4×15',rest:'60s'},{id:'dip',sets:'3×12',rest:'60s'},
+    {id:'plank',sets:'4×45s',rest:'30s'},{id:'pushup',sets:'3×12',rest:'60s'},{id:'crunch',sets:'3×20',rest:'45s'}
+  ]},
+  { label:'Antradienis', focus:'Kojos 🦵', exercises:[
+    {id:'squat',sets:'4×20',rest:'60s'},{id:'lunge',sets:'3×15',rest:'60s'},
+    {id:'rdl',sets:'3×15',rest:'60s'},{id:'slunge',sets:'3×12',rest:'60s'},{id:'russian',sets:'3×20',rest:'45s'}
+  ]},
+  { label:'Trečiadienis', focus:'Kardio 🔥', exercises:[
+    {id:'burpee',sets:'5×12',rest:'45s'},{id:'jj',sets:'4×60s',rest:'30s'},
+    {id:'crunch',sets:'4×25',rest:'45s'},{id:'plank',sets:'4×60s',rest:'30s'},{id:'squat',sets:'3×20',rest:'45s'}
+  ]},
+  { label:'Ketvirtadienis', focus:'Pilvas + Core 🧘', exercises:[
+    {id:'plank',sets:'5×60s',rest:'30s'},{id:'crunch',sets:'4×25',rest:'45s'},
+    {id:'russian',sets:'4×20',rest:'45s'},{id:'lunge',sets:'3×15',rest:'60s'},{id:'pushup',sets:'3×15',rest:'60s'}
+  ]},
+  { label:'Penktadienis', focus:'Visas kūnas 💥', exercises:[
+    {id:'squat',sets:'3×20',rest:'60s'},{id:'pushup',sets:'3×15',rest:'60s'},
+    {id:'lunge',sets:'3×15',rest:'60s'},{id:'burpee',sets:'3×12',rest:'60s'},{id:'plank',sets:'3×45s',rest:'30s'}
+  ]},
+  { label:'Šeštadienis', focus:'Lengvas judėjimas 🌿', exercises:[
+    {id:'jj',sets:'3×60s',rest:'30s'},{id:'plank',sets:'3×45s',rest:'30s'},
+    {id:'crunch',sets:'3×20',rest:'45s'},{id:'squat',sets:'3×15',rest:'60s'},{id:'russian',sets:'3×15',rest:'45s'}
+  ]},
+  { label:'Sekmadienis', focus:'Poilsis 😌', exercises:[] }
+];
+
+const CARDIO_PLANS = [
+  { label:'Pirmadienis', focus:'Intervalinis kardio 🔥', exercises:[
+    {id:'burpee',sets:'5×15',rest:'30s'},{id:'jj',sets:'5×60s',rest:'20s'},
+    {id:'squat',sets:'4×20',rest:'30s'},{id:'lunge',sets:'3×15',rest:'30s'},{id:'plank',sets:'3×60s',rest:'30s'}
+  ]},
+  { label:'Antradienis', focus:'Pilvo + Core 🧘', exercises:[
+    {id:'crunch',sets:'5×25',rest:'30s'},{id:'russian',sets:'4×25',rest:'30s'},
+    {id:'plank',sets:'5×60s',rest:'20s'},{id:'lunge',sets:'3×15',rest:'45s'},{id:'jj',sets:'3×45s',rest:'30s'}
+  ]},
+  { label:'Trečiadienis', focus:'Visas kūnas aktyviai 💥', exercises:[
+    {id:'burpee',sets:'4×15',rest:'30s'},{id:'squat',sets:'4×20',rest:'30s'},
+    {id:'pushup',sets:'4×15',rest:'30s'},{id:'jj',sets:'4×60s',rest:'20s'},{id:'plank',sets:'3×45s',rest:'30s'}
+  ]},
+  { label:'Ketvirtadienis', focus:'Apatinė dalis 🦵', exercises:[
+    {id:'squat',sets:'5×20',rest:'45s'},{id:'lunge',sets:'4×15',rest:'45s'},
+    {id:'slunge',sets:'3×15',rest:'45s'},{id:'rdl',sets:'3×15',rest:'45s'},{id:'crunch',sets:'3×25',rest:'30s'}
+  ]},
+  { label:'Penktadienis', focus:'Visas kūnas tempas 🏃', exercises:[
+    {id:'jj',sets:'5×60s',rest:'20s'},{id:'burpee',sets:'4×12',rest:'30s'},
+    {id:'pushup',sets:'3×15',rest:'30s'},{id:'squat',sets:'3×20',rest:'30s'},{id:'plank',sets:'3×60s',rest:'20s'}
+  ]},
+  { label:'Šeštadienis', focus:'Aktyvus pasivaikščiojimas 🌳', exercises:[
+    {id:'jj',sets:'3×45s',rest:'30s'},{id:'plank',sets:'3×45s',rest:'30s'},
+    {id:'crunch',sets:'3×20',rest:'30s'},{id:'lunge',sets:'3×12',rest:'30s'},{id:'russian',sets:'3×15',rest:'30s'}
+  ]},
+  { label:'Sekmadienis', focus:'Poilsis 😌', exercises:[] }
+];
+
+function getPlanForProfile(p) {
+  if (!p) return WEEK_PLANS;
+  if (p.location === 'sale') {
+    if (p.goal === 'svorio_metimas') return CARDIO_PLANS;
+    return GYM_PLANS;
+  }
+  if (p.goal === 'svorio_metimas') return CARDIO_PLANS;
+  return HOME_PLANS;
+}
+
+function getMealSuggestions(p) {
+  if (!p) return { bf: 0, ln: 1, dn: 0, tips: [] };
+  const d = new Date().getDate();
+  const isLoss = p.goal === 'svorio_metimas';
+  const isGain = p.goal === 'raumenu_augimas';
+
+  // Filter recipes by goal
+  let bfRecipes = RECIPES.breakfast;
+  let lnRecipes = RECIPES.lunch;
+  let dnRecipes = RECIPES.dinner;
+
+  if (isLoss) {
+    bfRecipes = RECIPES.breakfast.filter(r => r.cal < 350);
+    lnRecipes = RECIPES.lunch.filter(r => r.pro >= 25);
+    dnRecipes = RECIPES.dinner.filter(r => r.cal < 400);
+  } else if (isGain) {
+    bfRecipes = RECIPES.breakfast.filter(r => r.cal >= 300);
+    lnRecipes = RECIPES.lunch.filter(r => r.cal >= 400);
+    dnRecipes = RECIPES.dinner.filter(r => r.pro >= 30);
+  }
+
+  return {
+    bf: d % (bfRecipes.length||1),
+    ln: d % (lnRecipes.length||1),
+    dn: d % (dnRecipes.length||1),
+    bfList: bfRecipes,
+    lnList: lnRecipes,
+    dnList: dnRecipes,
+    tips: LANG==='en'
+      ? (isLoss ? ['Eat more protein — it keeps you fuller longer','Avoid processed foods and sugar','Drink 2L of water per day','Eat 3-4 times a day without snacking']
+        : isGain ? ['Eat every 2-3 hrs — about 5-6 meals a day','Eat protein within 30 min after workout','Carbs are important before workout','Sleep 7-9 hrs — muscles grow during sleep']
+        : ['Balanced diet — variety of foods','Lots of vegetables and fruits daily','Regular eating schedule','Drink enough water'])
+      : (isLoss
+      ? ['Valgyk daugiau baltymų — jie sočina ilgiau','Vengk perdirbtų produktų ir cukraus','Gerk 2L vandens per dieną','Valgymas 3-4 kartus per dieną be užkandžiavimo']
+      : isGain
+      ? ['Valgymas kas 2-3 val — apie 5-6 kartus per dieną','Po treniruotės per 30 min suvalgyti baltymų','Angliavandeniai svarbūs prieš treniruotę','Miegok 7-9 val — raumenys auga miego metu']
+      : ['Subalansuota mityba — įvairūs produktai','Daug daržovių ir vaisių kasdien','Reguliarus valgymo režimas','Gerk pakankamai vandens'])
+  };
+}
+
+// Override renderPlan to use profile
+const _renderPlanOrig = renderPlan;
+renderPlan = function() {
+  const p = ST.profile;
+  if (!p) { _renderPlanOrig(); return; }
+
+  const dayIdx = new Date().getDay();
+  const planIdx = dayIdx === 0 ? 6 : dayIdx - 1;
+  const plans = getPlanForProfile(p);
+  const plan = plans[planIdx];
+  const isRest = plan.exercises.length === 0;
+  const exMap = {};
+  EXERCISES.forEach(e => exMap[e.id] = e);
+  const ms = getMealSuggestions(p);
+
+  const goalLabels = LANG==='en'
+    ? {svorio_metimas:'Weight Loss 🔥', raumenu_augimas:'Muscle Gain 💪', bendra_forma:'General Fitness ⚡', palaikymas:'Maintain Weight ⚖️'}
+    : {svorio_metimas:'Svorio metimas 🔥', raumenu_augimas:'Raumenų augimas 💪', bendra_forma:'Bendra forma ⚡', palaikymas:'Svorio palaikymas ⚖️'};
+  const locLabels = LANG==='en' ? {namai:'🏠 Home', sale:'🏋️ Gym'} : {namai:'🏠 Namai', sale:'🏋️ Sporto salė'};
+  const bmi = (p.weight / Math.pow(p.height/100, 2)).toFixed(1);
+  const bmiLbl = bmi < 18.5 ? t('bmi_low') : bmi < 25 ? t('bmi_normal') : bmi < 30 ? t('bmi_over') : t('bmi_obese');
+
+  let html = `
+  <div class="card" style="background:linear-gradient(135deg,rgba(139,92,246,0.2),rgba(217,70,239,0.1));border-color:rgba(139,92,246,0.4)">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px">${t('plan_personal')}</div>
+        <div style="font-size:18px;font-weight:800;margin-top:4px">${goalLabels[p.goal]}</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:2px">${locLabels[p.location]} · ${p.weight}kg · ${p.height}cm</div>
+      </div>
+      <button onclick="openProfileEdit()" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer">${t('plan_edit')}</button>
+    </div>
+    <div style="display:flex;gap:16px">
+      <div style="text-align:center"><div style="font-size:16px;font-weight:800;color:var(--p1)">${ST.goal}</div><div style="font-size:10px;color:var(--text2)">${t('plan_kcal_day')}</div></div>
+      <div style="text-align:center"><div style="font-size:16px;font-weight:800;color:var(--g1)">${bmi}</div><div style="font-size:10px;color:var(--text2)">${t('plan_bmi')} (${bmiLbl})</div></div>
+      <div style="text-align:center"><div style="font-size:16px;font-weight:800;color:var(--y1)">${Math.round(p.weight*1.8)}g</div><div style="font-size:10px;color:var(--text2)">${t('plan_protein_day')}</div></div>
+      <div style="text-align:center"><div style="font-size:16px;font-weight:800;color:var(--a1)">${trDay(plan.label)}</div><div style="font-size:10px;color:var(--text2)">${t('today_label')}</div></div>
+    </div>
+  </div>`;
+
+  // WORKOUT
+  html += `<div class="card">
+    <div class="card-title">💪 ${trFocus(plan.focus)}</div>`;
+  if (isRest) {
+    html += `<div style="text-align:center;padding:30px 0">
+      <div style="font-size:48px">😌</div>
+      <div style="font-size:18px;font-weight:800;margin-top:12px">${t('plan_rest')}</div>
+      <div style="color:var(--text2);font-size:13px;margin-top:8px">Kūnas auga ir atsistatoma poilsio metu. Miegok 7-9 val.</div>
+    </div>`;
+  } else {
+    plan.exercises.forEach(ex => {
+      const e = exMap[ex.id]; if (!e) return;
+      const loc = ST.profile?.location || 'namai';
+      const ytQ = loc === 'sale' ? (e.ytGym || e.yt) : (e.ytHome || e.yt);
+      const ytUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(ytQ)}`;
+      html += `<div class="li">
+        <div style="font-size:26px;margin-right:12px">${e.emoji}</div>
+        <div class="li-l">
+          <div class="li-title">${LANG==='en'&&e.englishName?e.englishName:e.name}</div>
+          <div class="li-sub">${ex.sets} · ${t('ex_rest')}: ${ex.rest}</div>
+        </div>
+        <a href="${ytUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()"
+           style="background:rgba(255,0,0,0.15);border:1px solid rgba(255,0,0,0.3);border-radius:8px;padding:5px 10px;color:#FF4444;font-size:11px;font-weight:700;text-decoration:none;display:inline-block">▶ Video</a>
+      </div>`;
+    });
+  }
+  html += `</div>`;
+
+  // NUTRITION TIPS
+  if (ms.tips.length) {
+    html += `<div class="card">
+      <div class="card-title">${t('plan_nutrition_tips')}</div>
+      ${ms.tips.map(t=>`<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px"><span style="color:var(--g1);font-size:14px">✓</span><span style="font-size:13px;color:var(--text2)">${t}</span></div>`).join('')}
+    </div>`;
+  }
+
+  // MEALS
+  const mealHtml2 = (meal, label, icon) => {
+    if (!meal) return '';
+    const ing = meal.ing ? meal.ing.map(i=>`<span style="background:rgba(255,255,255,0.05);border-radius:6px;padding:3px 8px;font-size:11px;margin:2px;display:inline-block">${i}</span>`).join('') : '';
+    const steps = meal.steps ? meal.steps.map((s,i)=>`<div style="padding:3px 0;font-size:12px;color:var(--text2)"><span style="color:var(--p1);font-weight:700">${i+1}.</span> ${s}</div>`).join('') : '';
+    return `<div class="card" style="margin-bottom:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:30px">${meal.emoji}</span>
+          <div><div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase">${icon} ${label}</div>
+          <div style="font-size:14px;font-weight:700">${meal.name}</div></div>
+        </div>
+        <div style="text-align:right"><div style="font-size:17px;font-weight:800;color:var(--p1)">${meal.cal} kcal</div>
+        <div style="font-size:10px;color:var(--text2)">${meal.pro}${LANG==='en'?'p':'b'}·${meal.carb}${LANG==='en'?'c':'a'}·${meal.fat}${LANG==='en'?'f':'r'}</div></div>
+      </div>
+      ${ing?`<div style="margin-bottom:8px">${ing}</div>`:''}
+      ${steps?`<div>${steps}</div>`:''}
+    </div>`;
+  };
+
+  const bf = (ms.bfList||RECIPES.breakfast)[ms.bf % ((ms.bfList||RECIPES.breakfast).length)];
+  const ln = (ms.lnList||RECIPES.lunch)[ms.ln % ((ms.lnList||RECIPES.lunch).length)];
+  const dn = (ms.dnList||RECIPES.dinner)[ms.dn % ((ms.dnList||RECIPES.dinner).length)];
+  const d = new Date().getDate();
+  const sn1 = RECIPES.snack[d % RECIPES.snack.length];
+  const sn2 = RECIPES.snack[(d+4) % RECIPES.snack.length];
+
+  html += `<div class="card" style="background:linear-gradient(135deg,rgba(16,185,129,0.1),rgba(34,211,153,0.05));border-color:rgba(16,185,129,0.3)">
+    <div style="font-size:15px;font-weight:800">🍽️ ${LANG==='en'?'Today\'s meal plan':t('plan_meal_plan')}</div>
+    <div style="font-size:12px;color:var(--text2);margin-top:4px">${LANG==='en'?'Recommended for your goal:':t('plan_meal_rec')+':'} <strong style="color:var(--g1)">${goalLabels[p.goal]}</strong></div>
+  </div>`;
+  html += mealHtml2(bf, 'Pusryčiai', '🌅');
+  html += mealHtml2(sn1, 'Užkandis', '🍎');
+  html += mealHtml2(ln, 'Pietūs', '☀️');
+  html += mealHtml2(sn2, 'Popietinis užkandis', '🥜');
+  html += mealHtml2(dn, 'Vakarienė', '🌙');
+  html += `<div style="height:20px"></div>`;
+  document.getElementById('planContent').innerHTML = html;
+};
+
+// Check if profile exists, show onboarding if not
+if (!ST.profile) {
+  setTimeout(() => showOnboarding(), 800);
+}
+</script>
+
+<!-- ONBOARDING MODAL -->
+<div id="onboardModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);backdrop-filter:blur(8px);z-index:1000;overflow-y:auto;padding:20px">
+  <div style="max-width:500px;margin:0 auto;background:#0D0D1A;border:1px solid rgba(139,92,246,0.3);border-radius:24px;padding:24px">
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="font-size:48px">🎯</div>
+      <h2 id="ob_h2" style="font-size:22px;font-weight:900;background:linear-gradient(135deg,#8B5CF6,#D946EF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-top:8px">Sukurkime tavo asmeninį planą</h2>
+      <p id="ob_p" style="color:#94A3B8;font-size:13px;margin-top:6px">Atsakyk į klausimus ir gausite individualų treniruočių ir mitybos planą</p>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div>
+        <label style="font-size:11px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:1px">Lytis</label>
+        <select id="ob_gender" style="width:100%;background:#1A1A2E;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px;color:#F1F0FF;font-size:14px;margin-top:6px">
+          <option value="">Pasirinkti...</option>
+          <option value="vyras">👨 Vyras</option>
+          <option value="moteris">👩 Moteris</option>
+        </select>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+        <div>
+          <label style="font-size:11px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:1px">Amžius</label>
+          <input id="ob_age" type="number" placeholder="pvz. 30" min="10" max="100" style="width:100%;background:#1A1A2E;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px;color:#F1F0FF;font-size:14px;margin-top:6px">
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:1px">Ūgis (cm)</label>
+          <input id="ob_height" type="number" placeholder="pvz. 175" min="100" max="250" style="width:100%;background:#1A1A2E;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px;color:#F1F0FF;font-size:14px;margin-top:6px">
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:1px">Svoris (kg)</label>
+          <input id="ob_weight" type="number" placeholder="pvz. 75" min="30" max="300" step="0.5" style="width:100%;background:#1A1A2E;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px;color:#F1F0FF;font-size:14px;margin-top:6px">
+        </div>
+      </div>
+
+      <div>
+        <label style="font-size:11px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:1px">Tikslas</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px" id="goalBtns">
+          <button onclick="selectOb('goal','svorio_metimas',this)" class="ob-opt">🔥 Numesti svorio</button>
+          <button onclick="selectOb('goal','raumenu_augimas',this)" class="ob-opt">💪 Auginti raumenis</button>
+          <button onclick="selectOb('goal','bendra_forma',this)" class="ob-opt">⚡ Bendra forma</button>
+          <button onclick="selectOb('goal','palaikymas',this)" class="ob-opt">⚖️ Palaikyti svorį</button>
+        </div>
+        <input type="hidden" id="ob_goal" value="">
+      </div>
+
+      <div>
+        <label style="font-size:11px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:1px">Sporto vieta</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
+          <button onclick="selectOb('location','namai',this)" class="ob-opt">🏠 Namai (kūno svoris)</button>
+          <button onclick="selectOb('location','sale',this)" class="ob-opt">🏋️ Sporto salė</button>
+        </div>
+        <input type="hidden" id="ob_location" value="">
+      </div>
+
+      <div>
+        <label style="font-size:11px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:1px">Aktyvumo lygis</label>
+        <select id="ob_activity" style="width:100%;background:#1A1A2E;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px;color:#F1F0FF;font-size:13px;margin-top:6px">
+          <option value="0">🛋️ Labai mažas — sėdimas darbas, nesportuoju</option>
+          <option value="1">🚶 Mažas — sportuoju 1-3 kartus per sav.</option>
+          <option value="2" selected>🏃 Vidutinis — sportuoju 3-5 kartus per sav.</option>
+          <option value="3">💪 Aukštas — sportuoju 6-7 kartus per sav.</option>
+          <option value="4">🔥 Labai aukštas — intensyvus sportas kasdien</option>
+        </select>
+      </div>
+
+      <button onclick="saveProfile()" style="background:linear-gradient(135deg,#8B5CF6,#D946EF);border:none;border-radius:14px;padding:16px;color:#fff;font-size:15px;font-weight:800;cursor:pointer;margin-top:8px;box-shadow:0 4px 20px rgba(139,92,246,0.4)">
+        🚀 Sukurti mano asmeninį planą
+      </button>
+      <button id="ob_cancel_btn" onclick="closeOnboarding()" style="display:none;background:none;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px;color:#94A3B8;font-size:13px;cursor:pointer">Atšaukti</button>
+    </div>
+  </div>
+</div>
+
+<style>
+.ob-opt {
+  background:#1A1A2E;border:1px solid rgba(255,255,255,0.1);border-radius:12px;
+  padding:12px 8px;color:#94A3B8;font-size:13px;font-weight:600;cursor:pointer;
+  transition:all 0.2s;text-align:center;
+}
+.ob-opt:hover { border-color:rgba(139,92,246,0.4);color:#fff; }
+.ob-opt.sel { background:rgba(139,92,246,0.2);border-color:#8B5CF6;color:#A78BFA; }
+</style>
+
+<script>
+const _obVals = {};
+function selectOb(key, val, el) {
+  _obVals[key] = val;
+  document.getElementById('ob_'+key).value = val;
+  el.closest('div').querySelectorAll('.ob-opt').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');
+}
+</script>
+</body>
+</html>
